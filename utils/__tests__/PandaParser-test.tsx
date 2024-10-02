@@ -29,6 +29,6 @@ describe("PandaParser", () => {
     const res = await PandaParser.getAllAssignmentInfo(user);
 
     console.log(res);
-    expect(res.length).toBeTruthy;
+    expect(res.length).toBeTruthy();
   }, 60000);
 });
