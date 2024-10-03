@@ -1,6 +1,4 @@
-import * as cheerio from "cheerio";
-import { URLSearchParams } from "url";
-
+import URLParser from "./URLParser";
 import User from "../models/User";
 import Assignment from "../models/Assignment";
 import Attachment from "../models/Attachment";
@@ -75,35 +73,35 @@ export default class PandaParser {
     const loginUrl =
       "https://panda.ecs.kyoto-u.ac.jp/cas/login?service=https%3A%2F%2Fpanda.ecs.kyoto-u.ac.jp%2Fsakai-login-tool%2Fcontainer";
 
-    try {
-      const response = await user.session.get(loginUrl);
-      const $ = cheerio.load(response.data);
+    const response = await user.session.get(loginUrl);
+    const lt = URLParser.getInputValueByName(response.data, 'lt');
+    const execution = URLParser.getInputValueByName(response.data, 'execution');
 
-      const lt = $('input[name="lt"]').val();
-      const execution = $('input[name="execution"]').val();
+    // ltやexecutionが取得できないのはログイン済みの時であるため
+    // TODO: 適切な処理とは思えないので要検討
+    if (!lt || !execution) {
+      return;
+    }
 
-      if (!lt || !execution) {
-        throw new Error(
-          `Failed to retrieve login form fields. lt: ${lt}, execution: ${execution}`,
-        );
-      }
+    const formData = new URLSearchParams();
+    formData.append("username", user.username);
+    formData.append("password", user.password);
+    formData.append("lt", lt);
+    formData.append("execution", execution);
+    formData.append("_eventId", "submit");
 
-      const formData = new URLSearchParams();
-      formData.append("username", user.username);
-      formData.append("password", user.password);
-      formData.append("lt", lt as string);
-      formData.append("execution", execution as string);
-      formData.append("_eventId", "submit");
+    const loginResponse = await user.session.post(loginUrl, formData.toString(), {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    });
 
-      await user.session.post(loginUrl, formData.toString(), {
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-      });
-      await user.jar.getCookies(loginUrl);
-    } catch (error) {
-      console.error("Login failed:", error);
-      throw error;
+    const errorMessage =
+      '<div id="msg" class="errors">';
+    if (loginResponse.data.includes(errorMessage)) {
+      throw new Error(
+        `Failed to login with provided credentials. username: ${user.username}.`,
+      );
     }
   }
 }
