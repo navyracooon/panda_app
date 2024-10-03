@@ -74,8 +74,8 @@ export default class PandaParser {
       "https://panda.ecs.kyoto-u.ac.jp/cas/login?service=https%3A%2F%2Fpanda.ecs.kyoto-u.ac.jp%2Fsakai-login-tool%2Fcontainer";
 
     const response = await user.session.get(loginUrl);
-    const lt = URLParser.getInputValueByName(response.data, 'lt');
-    const execution = URLParser.getInputValueByName(response.data, 'execution');
+    const lt = URLParser.getInputValueByName(response.data, "lt");
+    const execution = URLParser.getInputValueByName(response.data, "execution");
 
     // ltやexecutionが取得できないのはログイン済みの時であるため
     // TODO: 適切な処理とは思えないので要検討
@@ -90,14 +90,17 @@ export default class PandaParser {
     formData.append("execution", execution);
     formData.append("_eventId", "submit");
 
-    const loginResponse = await user.session.post(loginUrl, formData.toString(), {
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
+    const loginResponse = await user.session.post(
+      loginUrl,
+      formData.toString(),
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
       },
-    });
+    );
 
-    const errorMessage =
-      '<div id="msg" class="errors">';
+    const errorMessage = '<div id="msg" class="errors">';
     if (loginResponse.data.includes(errorMessage)) {
       throw new Error(
         `Failed to login with provided credentials. username: ${user.username}.`,
