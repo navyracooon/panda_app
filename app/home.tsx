@@ -4,31 +4,21 @@ import {
   StyleSheet,
   Text,
   View,
-  Animated,
-  Easing,
 } from "react-native";
 import AssignmentCard from "../components/AssignmentCard";
 import PandaParser from "../utils/PandaParser";
 import User from "../models/User";
 import * as SecureStore from "expo-secure-store";
 import { useAssignments } from "../contexts/AssignmentContext";
+import Spinner from "../components/Spinner";
 
 export default function HomeScreen() {
   const { assignments, setAssignments } = useAssignments();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const spinValue = new Animated.Value(0);
 
   useEffect(() => {
     fetchAssignments();
-    Animated.loop(
-      Animated.timing(spinValue, {
-        toValue: 1,
-        duration: 1000,
-        easing: Easing.linear,
-        useNativeDriver: true,
-      }),
-    ).start();
   }, []);
 
   const fetchAssignments = async () => {
@@ -48,25 +38,16 @@ export default function HomeScreen() {
     } catch (err) {
       console.error("Error fetching assignments:", err);
       setError(
-        err instanceof Error ? err.message : "An unknown error occurred",
+        err instanceof Error ? err.message : "An unknown error occurred"
       );
       setIsLoading(false);
     }
   };
 
-  const renderItem = ({ item }) => <AssignmentCard assignment={item} />;
-
-  const spin = spinValue.interpolate({
-    inputRange: [0, 1],
-    outputRange: ["0deg", "360deg"],
-  });
-
   if (isLoading) {
     return (
       <View style={styles.centerContainer}>
-        <Animated.View
-          style={[styles.loader, { transform: [{ rotate: spin }] }]}
-        />
+        <Spinner size={40} color="#000" message="fetching assignments..." />
       </View>
     );
   }
@@ -83,7 +64,7 @@ export default function HomeScreen() {
     <View style={styles.container}>
       <FlatList
         data={assignments}
-        renderItem={renderItem}
+        renderItem={({ item }) => <AssignmentCard assignment={item} />}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.listContent}
       />
@@ -110,13 +91,5 @@ const styles = StyleSheet.create({
     color: "red",
     fontSize: 16,
     textAlign: "center",
-  },
-  loader: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    borderWidth: 3,
-    borderColor: "#000",
-    borderTopColor: "transparent",
   },
 });

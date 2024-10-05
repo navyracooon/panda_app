@@ -1,14 +1,14 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter, useRootNavigationState } from "expo-router";
-import { View, StyleSheet, Animated, Easing } from "react-native";
+import { View, StyleSheet } from "react-native";
 import * as SecureStore from "expo-secure-store";
 import User from "../models/User";
+import Spinner from "../components/Spinner";
 
 export default function Index() {
   const router = useRouter();
   const navigationState = useRootNavigationState();
   const [isChecking, setIsChecking] = useState(true);
-  const spinValue = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     if (!navigationState?.key) {
@@ -17,20 +17,6 @@ export default function Index() {
 
     checkLoginStatus();
   }, [navigationState?.key]);
-
-  useEffect(() => {
-    const spinAnimation = Animated.loop(
-      Animated.timing(spinValue, {
-        toValue: 1,
-        duration: 1000,
-        easing: Easing.linear,
-        useNativeDriver: true,
-      }),
-    );
-    spinAnimation.start();
-
-    return () => spinAnimation.stop();
-  }, [spinValue]);
 
   const checkLoginStatus = async () => {
     try {
@@ -58,17 +44,10 @@ export default function Index() {
     }
   };
 
-  const spin = spinValue.interpolate({
-    inputRange: [0, 1],
-    outputRange: ["0deg", "360deg"],
-  });
-
   if (isChecking || !navigationState?.key) {
     return (
       <View style={styles.container}>
-        <Animated.View
-          style={[styles.loader, { transform: [{ rotate: spin }] }]}
-        />
+        <Spinner size={40} color="#000" message="initializing..." />
       </View>
     );
   }
@@ -82,13 +61,5 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#FFFFFF",
-  },
-  loader: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    borderWidth: 3,
-    borderColor: "#000",
-    borderTopColor: "transparent",
   },
 });

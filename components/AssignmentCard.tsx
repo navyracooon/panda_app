@@ -9,6 +9,7 @@ import {
 import { format, differenceInDays } from "date-fns";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import * as Haptics from 'expo-haptics';
 import Assignment from "../models/Assignment";
 import RenderHtml from "react-native-render-html";
 
@@ -40,6 +41,7 @@ export default function AssignmentCard(props: Props) {
   return (
     <TouchableOpacity
       onPress={() => router.push(`/assignment/${assignment.id}`)}
+      onPressIn={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)}
       style={styles.card}
     >
       <View style={styles.header}>

@@ -1,12 +1,23 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Stack, useRouter } from "expo-router";
 import { TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { LogBox } from "react-native";
 
 import { AssignmentProvider } from "../contexts/AssignmentContext";
 
 export default function RootLayout() {
   const router = useRouter();
+
+  useEffect(() => {
+    // react-native-render-html によるエラー回避
+    LogBox.ignoreLogs([
+      'TNodeChildrenRenderer',
+      'MemoizedTNodeRenderer',
+      'TRenderEngineProvider',
+      'bound renderChildren',
+    ]);
+  }, []);
 
   return (
     <AssignmentProvider>

@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import * as Haptics from 'expo-haptics';
 import { format, differenceInDays } from "date-fns";
 import * as Calendar from "expo-calendar";
 import { useAssignments } from "../../contexts/AssignmentContext";
@@ -66,7 +67,7 @@ export default function AssignmentDetailScreen() {
           };
 
           await Calendar.createEventAsync(defaultCalendar.id, eventDetails);
-          Alert.alert("Success", "Assignment added to calendar");
+          Alert.alert("Assignment added to calendar");
         } else {
           Alert.alert("Error", "No calendar found on the device");
         }
@@ -92,6 +93,7 @@ export default function AssignmentDetailScreen() {
         <TouchableOpacity
           style={styles.dueDateContainer}
           onPress={handleDatePress}
+          onPressIn={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)}
         >
           <Ionicons name="calendar-outline" size={24} color="#000" />
           <View
@@ -114,7 +116,11 @@ export default function AssignmentDetailScreen() {
             source={{ html: assignment.instructions }}
           />
         </View>
-        <TouchableOpacity style={styles.urlContainer} onPress={handleUrlPress}>
+        <TouchableOpacity
+          style={styles.urlContainer}
+          onPress={handleUrlPress}
+          onPressIn={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)}
+        >
           <Ionicons name="link-outline" size={24} color="#007AFF" />
           <Text style={styles.url} numberOfLines={1} ellipsizeMode="tail">
             {`https://panda.ecs.kyoto-u.ac.jp/portal/site/${assignment.context}`}

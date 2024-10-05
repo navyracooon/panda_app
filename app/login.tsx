@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from "react";
+import React, { useState, useRef, useCallback, useEffect } from "react";
 import {
   View,
   Text,
@@ -15,7 +15,9 @@ import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import * as SecureStore from "expo-secure-store";
+import * as Haptics from 'expo-haptics';
 import User from "../models/User";
+import { grantNotificationPermission } from "../utils/notificationUtils";
 
 const { width } = Dimensions.get("window");
 
@@ -25,6 +27,10 @@ export default function LoginScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const scaleAnim = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    grantNotificationPermission();
+  }, []);
 
   const handleLogin = async () => {
     if (!ecsId || !password) {
@@ -55,6 +61,7 @@ export default function LoginScreen() {
   };
 
   const handlePressIn = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
     Animated.spring(scaleAnim, {
       toValue: 1.05,
       useNativeDriver: true,
