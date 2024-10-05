@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useRouter, useRootNavigationState } from "expo-router";
 import { View, StyleSheet } from "react-native";
 import * as SecureStore from "expo-secure-store";
@@ -12,15 +12,7 @@ export default function Index() {
   const [isChecking, setIsChecking] = useState(true);
   const { t } = useLocalization();
 
-  useEffect(() => {
-    if (!navigationState?.key) {
-      return;
-    }
-
-    checkLoginStatus();
-  }, [navigationState?.key]);
-
-  const checkLoginStatus = async () => {
+  const checkLoginStatus = useCallback(async () => {
     try {
       const userCredentialsString =
         await SecureStore.getItemAsync("userCredentials");
@@ -44,7 +36,15 @@ export default function Index() {
     } finally {
       setIsChecking(false);
     }
-  };
+  }, [router]);
+
+  useEffect(() => {
+    if (!navigationState?.key) {
+      return;
+    }
+
+    checkLoginStatus();
+  }, [navigationState?.key, checkLoginStatus]);
 
   if (isChecking || !navigationState?.key) {
     return (
