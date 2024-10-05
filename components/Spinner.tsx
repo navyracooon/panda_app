@@ -47,7 +47,11 @@ export default function Spinner({
           },
         ]}
       />
-      {message && <Text style={[styles.message, { color }]}>{message}</Text>}
+      {message && (
+        <View style={styles.messageContainer}>
+          <Text style={[styles.message, { color }]}>{message}</Text>
+        </View>
+      )}
     </View>
   );
 }
@@ -60,9 +64,14 @@ const styles = StyleSheet.create({
     borderWidth: 3,
     borderTopColor: "transparent",
   },
-  message: {
+  messageContainer: {
     marginTop: 10,
+    alignItems: "center",
+    width: "100%",
+  },
+  message: {
     fontSize: 16,
     fontWeight: "600",
+    textAlign: "center",
   },
 });

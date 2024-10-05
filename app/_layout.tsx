@@ -39,7 +39,7 @@ export default function RootLayout() {
           <Stack.Screen
             name="home"
             options={{
-              title: "Home",
+              title: "",
               headerBackVisible: false,
               headerRight: () => (
                 <TouchableOpacity onPress={() => router.push("/settings")}>
@@ -51,7 +51,7 @@ export default function RootLayout() {
           <Stack.Screen
             name="assignment/[id]"
             options={{
-              title: "Assignment Details",
+              title: "",
               headerBackTitleVisible: false,
               headerRight: () => (
                 <TouchableOpacity onPress={() => router.push("/settings")}>
@@ -63,7 +63,7 @@ export default function RootLayout() {
           <Stack.Screen
             name="settings"
             options={{
-              title: "Settings",
+              title: "",
               headerBackTitleVisible: false,
             }}
           />

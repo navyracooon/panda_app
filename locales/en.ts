@@ -20,9 +20,10 @@ export default {
     title: "Home",
     noAssignments: "No assignments found",
     fetchingAssignments:
-      "Fetching assignments... (This might take about a minute)",
+      "Fetching assignments... \n (This might take about a minute)",
   },
   assignment: {
+    title: "Assignment Details",
     viewDetails: "View Details",
     dueDate: "Due Date",
     description: "Description",

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
   Text,
@@ -10,13 +10,19 @@ import {
   FlatList,
   TouchableWithoutFeedback,
   Linking,
+  RefreshControl,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import * as SecureStore from "expo-secure-store";
-import { grantNotificationPermission } from "../utils/notificationUtils";
+import * as Localization from "expo-localization";
+import {
+  grantNotificationPermission,
+  setupNotifications,
+} from "../utils/notificationUtils";
 import { useLocalization } from "../contexts/LocalizationContext";
+import { useAssignments } from "../contexts/AssignmentContext";
 
 const languages = [
   { code: "ja", label: "日本語" },
@@ -33,25 +39,43 @@ const notificationOptions = [
 
 export default function SettingsScreen() {
   const router = useRouter();
+  const { assignments } = useAssignments();
   const { t, locale, setLocale } = useLocalization();
   const [showLanguageModal, setShowLanguageModal] = useState(false);
   const [showNotificationModal, setShowNotificationModal] = useState(false);
   const [selectedNotifications, setSelectedNotifications] = useState<string[]>(
     [],
   );
+  const [refreshing, setRefreshing] = useState(false);
 
-  useEffect(() => {
-    loadSettings();
-  }, [locale]);
+  const loadSettings = useCallback(async () => {
+    const storedLanguage = await SecureStore.getItemAsync("userLanguage");
+    if (storedLanguage) {
+      setLocale(storedLanguage);
+    } else {
+      const deviceLocale = Localization.locale.split("-")[0];
+      const initialLocale = deviceLocale === "ja" ? "ja" : "en";
+      setLocale(initialLocale);
+      await SecureStore.setItemAsync("userLanguage", initialLocale);
+    }
 
-  const loadSettings = async () => {
     const storedNotifications = await SecureStore.getItemAsync(
       "selectedNotifications",
     );
     if (storedNotifications) {
       setSelectedNotifications(JSON.parse(storedNotifications));
     }
-  };
+  }, [setLocale]);
+
+  useEffect(() => {
+    loadSettings();
+  }, [loadSettings]);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await loadSettings();
+    setRefreshing(false);
+  }, [loadSettings]);
 
   const handleLanguageChange = async (selectedLanguage: string) => {
     setLocale(selectedLanguage);
@@ -70,6 +94,10 @@ export default function SettingsScreen() {
           "selectedNotifications",
           JSON.stringify(newSelection),
         );
+
+        // Setup notifications with the new selection
+        setupNotifications(assignments, newSelection);
+
         return newSelection;
       });
     }
@@ -133,7 +161,17 @@ export default function SettingsScreen() {
   );
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView
+      style={styles.container}
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          colors={["#808080"]}
+          tintColor="#808080"
+        />
+      }
+    >
       <View style={styles.settingsContainer}>
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t("settings.preferences")}</Text>
@@ -386,6 +424,7 @@ const styles = StyleSheet.create({
   },
   button: {
     backgroundColor: "#FF3333",
+    marginTop: 10,
     padding: 14,
     borderRadius: 8,
     alignItems: "center",

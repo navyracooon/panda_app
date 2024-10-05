@@ -19,9 +19,10 @@ export default {
   home: {
     title: "ホーム",
     noAssignments: "課題が見つかりません",
-    fetchingAssignments: "課題を取得中... (1分程度かかることがあります)",
+    fetchingAssignments: "課題を取得中... \n (1分程度かかることがあります)",
   },
   assignment: {
+    title: "課題詳細",
     viewDetails: "詳細を見る",
     dueDate: "提出期限",
     description: "説明",

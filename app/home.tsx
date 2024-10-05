@@ -7,6 +7,7 @@ import * as SecureStore from "expo-secure-store";
 import { useAssignments } from "../contexts/AssignmentContext";
 import Spinner from "../components/Spinner";
 import { useLocalization } from "../contexts/LocalizationContext";
+import { setupNotifications } from "../utils/notificationUtils";
 
 export default function HomeScreen() {
   const { assignments, setAssignments } = useAssignments();
@@ -35,7 +36,24 @@ export default function HomeScreen() {
         const user = new User(userCredentials.ecsId, userCredentials.password);
 
         const assignmentList = await PandaParser.getAllAssignmentInfo(user);
-        setAssignments(assignmentList);
+
+        // Sort assignments by due date (closest first)
+        const sortedAssignments = assignmentList.sort((a, b) => {
+          const dateA = new Date(a.dueTime);
+          const dateB = new Date(b.dueTime);
+          return dateA.getTime() - dateB.getTime();
+        });
+
+        setAssignments(sortedAssignments);
+
+        // Setup notifications for the fetched assignments
+        const selectedNotificationsString = await SecureStore.getItemAsync(
+          "selectedNotifications",
+        );
+        if (selectedNotificationsString) {
+          const selectedNotifications = JSON.parse(selectedNotificationsString);
+          await setupNotifications(sortedAssignments, selectedNotifications);
+        }
       } catch (err) {
         console.error("Error fetching assignments:", err);
         setError(err instanceof Error ? err.message : t("common.error"));
