@@ -1,0 +1,63 @@
+export default {
+  common: {
+    loading: "読み込み中...",
+    error: "エラー",
+    close: "閉じる",
+    cancel: "キャンセル",
+    ok: "OK",
+  },
+  login: {
+    title: "PandA アプリ",
+    ecsIdPlaceholder: "ECS-ID",
+    passwordPlaceholder: "パスワード",
+    loginButton: "ログイン",
+    loggingInButton: "ログイン中...",
+    errorMessage: "ECS-IDとパスワードを入力してください",
+    invalidCredentials: "ECS-IDまたはパスワードが無効です",
+    loginError: "ログイン中にエラーが発生しました。もう一度お試しください。",
+  },
+  home: {
+    title: "ホーム",
+    noAssignments: "課題が見つかりません",
+    fetchingAssignments: "課題を取得中... \n (1分程度かかることがあります)",
+  },
+  assignment: {
+    title: "課題詳細",
+    viewDetails: "詳細を見る",
+    dueDate: "提出期限",
+    description: "説明",
+    addToCalendar: "カレンダーに追加",
+    calendarPermissionRequired:
+      "イベントを追加するにはカレンダーの許可が必要です",
+    eventAddedToCalendar: "課題がカレンダーに追加されました",
+    noCalendarFound: "デバイスにカレンダーが見つかりません",
+    failedToAddEvent: "課題をカレンダーに追加できませんでした",
+  },
+  settings: {
+    title: "設定",
+    preferences: "設定",
+    language: "言語",
+    notifications: "通知",
+    support: "サポート",
+    account: "アカウント",
+    logout: "ログアウト",
+    logoutConfirmation: "ログアウトしてもよろしいですか？",
+    contributionDescription:
+      "このプロジェクトはオープンソースプロジェクトであり、貢献を歓迎します。ぜひGitHubリポジトリを訪れてください。",
+    donationDescription:
+      "App StoreやGoogle Play Storeの開発者手数料など、開発コストをカバーするために寄付に頼っています。アプリの維持と改善のためにご協力いただければ幸いです。",
+    contributeGithub: "GitHub",
+    buyMeACoffee: "Buy me a coffee",
+    selectLanguage: "言語を選択",
+    notificationSettings: "通知設定",
+    none: "なし",
+    selected: "選択済み",
+  },
+  notificationOptions: {
+    "7days": "7日前",
+    "3days": "3日前",
+    "1day": "1日前",
+    "3hours": "3時間前",
+    "1hour": "1時間前",
+  },
+};
