@@ -1,24 +1,37 @@
 export default {
+  common: {
+    loading: "Loading...",
+    error: "Error",
+    close: "Close",
+    cancel: "Cancel",
+    ok: "OK",
+  },
   login: {
     title: "PandA App",
     ecsIdPlaceholder: "ECS-ID",
     passwordPlaceholder: "Password",
     loginButton: "Login",
     loggingInButton: "Logging in...",
-    errorTitle: "Error",
     errorMessage: "Please enter both ECS-ID and password",
     invalidCredentials: "Invalid ECS-ID or password",
     loginError: "An error occurred during login. Please try again.",
   },
   home: {
-    title: "Assignments",
+    title: "Home",
     noAssignments: "No assignments found",
-    loading: "Loading assignments...",
+    fetchingAssignments:
+      "Fetching assignments... (This might take about a minute)",
   },
-  assignmentDetail: {
+  assignment: {
+    viewDetails: "View Details",
     dueDate: "Due Date",
     description: "Description",
-    loading: "Loading assignment details...",
+    addToCalendar: "Add to Calendar",
+    calendarPermissionRequired:
+      "Calendar permission is required to add the event",
+    eventAddedToCalendar: "Assignment added to calendar",
+    noCalendarFound: "No calendar found on the device",
+    failedToAddEvent: "Failed to add assignment to calendar",
   },
   settings: {
     title: "Settings",
@@ -29,15 +42,14 @@ export default {
     account: "Account",
     logout: "Logout",
     logoutConfirmation: "Are you sure you want to logout?",
-    cancel: "Cancel",
-    ok: "OK",
-    contributionDescription: "This is an open-source project and contributions are welcome. You can contribute to the development for free by visiting our GitHub repository.",
-    donationDescription: "We rely on donations to cover development costs, including Apple Store and Google Play Store developer fees. Your support helps us maintain and improve the app.",
+    contributionDescription:
+      "This is an open-source project and contributions are welcome. You can contribute to the development for free by visiting our GitHub repository.",
+    donationDescription:
+      "We rely on donations to cover development costs, including Apple Store and Google Play Store developer fees. Your support helps us maintain and improve the app.",
     contributeGithub: "Contribute on GitHub",
     buyMeACoffee: "Buy me a coffee",
     selectLanguage: "Select Language",
     notificationSettings: "Notification Settings",
-    close: "Close",
     none: "None",
     selected: "selected",
   },

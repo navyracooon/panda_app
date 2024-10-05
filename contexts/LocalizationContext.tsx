@@ -1,8 +1,14 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
-import * as Localization from 'expo-localization';
-import { I18n } from 'i18n-js';
-import en from '../locales/en';
-import ja from '../locales/ja';
+import React, {
+  createContext,
+  useState,
+  useEffect,
+  useContext,
+  PropsWithChildren,
+} from "react";
+import * as Localization from "expo-localization";
+import { I18n } from "i18n-js";
+import en from "../locales/en";
+import ja from "../locales/ja";
 
 const i18n = new I18n({
   en,
@@ -10,7 +16,7 @@ const i18n = new I18n({
 });
 
 i18n.enableFallback = true;
-i18n.defaultLocale = 'ja';
+i18n.defaultLocale = "en";
 
 type LocalizationContextType = {
   t: (scope: string, options?: object) => string;
@@ -19,12 +25,14 @@ type LocalizationContextType = {
 };
 
 const LocalizationContext = createContext<LocalizationContextType>({
-  t: () => '',
-  locale: 'en',
+  t: () => "",
+  locale: "en",
   setLocale: () => {},
 });
 
-export const LocalizationProvider: React.FC = ({ children }) => {
+export const LocalizationProvider: React.FC<PropsWithChildren> = ({
+  children,
+}) => {
   const [locale, setLocale] = useState(Localization.locale);
 
   useEffect(() => {

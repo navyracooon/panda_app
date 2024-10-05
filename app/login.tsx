@@ -15,7 +15,7 @@ import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import * as SecureStore from "expo-secure-store";
-import * as Haptics from 'expo-haptics';
+import * as Haptics from "expo-haptics";
 import User from "../models/User";
 import { grantNotificationPermission } from "../utils/notificationUtils";
 

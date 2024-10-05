@@ -9,9 +9,10 @@ import {
 import { format, differenceInDays } from "date-fns";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import * as Haptics from 'expo-haptics';
+import * as Haptics from "expo-haptics";
 import Assignment from "../models/Assignment";
 import RenderHtml from "react-native-render-html";
+import { useLocalization } from "../contexts/LocalizationContext";
 
 type Props = {
   assignment: Assignment;
@@ -23,6 +24,7 @@ export default function AssignmentCard(props: Props) {
   const { assignment } = props;
   const router = useRouter();
   const { width } = useWindowDimensions();
+  const { t } = useLocalization();
 
   const getDueDateColor = (dueDate: Date) => {
     const daysUntilDue = differenceInDays(dueDate, new Date());
@@ -35,7 +37,7 @@ export default function AssignmentCard(props: Props) {
 
   const truncateHtml = (html: string, maxLength: number) => {
     if (html.length <= maxLength) return html;
-    return html.substr(0, maxLength) + "...";
+    return html.substring(0, maxLength) + "...";
   };
 
   return (
@@ -70,7 +72,9 @@ export default function AssignmentCard(props: Props) {
       </View>
       <View style={styles.footer}>
         <View style={styles.detailsButton}>
-          <Text style={styles.detailsButtonText}>View Details</Text>
+          <Text style={styles.detailsButtonText}>
+            {t("assignment.viewDetails")}
+          </Text>
           <Ionicons name="chevron-forward" size={16} color="#007AFF" />
         </View>
       </View>

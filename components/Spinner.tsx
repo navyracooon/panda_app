@@ -1,5 +1,5 @@
-import React, { useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Animated, Easing } from 'react-native';
+import React, { useEffect, useRef } from "react";
+import { View, Text, StyleSheet, Animated, Easing } from "react-native";
 
 interface SpinnerProps {
   size?: number;
@@ -7,7 +7,11 @@ interface SpinnerProps {
   message?: string;
 }
 
-export default function Spinner({ size = 40, color = '#000', message }: SpinnerProps) {
+export default function Spinner({
+  size = 40,
+  color = "#000",
+  message,
+}: SpinnerProps) {
   const spinValue = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -17,7 +21,7 @@ export default function Spinner({ size = 40, color = '#000', message }: SpinnerP
         duration: 1000,
         easing: Easing.linear,
         useNativeDriver: true,
-      })
+      }),
     );
     spinAnimation.start();
 
@@ -26,7 +30,7 @@ export default function Spinner({ size = 40, color = '#000', message }: SpinnerP
 
   const spin = spinValue.interpolate({
     inputRange: [0, 1],
-    outputRange: ['0deg', '360deg'],
+    outputRange: ["0deg", "360deg"],
   });
 
   return (
@@ -50,15 +54,15 @@ export default function Spinner({ size = 40, color = '#000', message }: SpinnerP
 
 const styles = StyleSheet.create({
   container: {
-    alignItems: 'center',
+    alignItems: "center",
   },
   loader: {
     borderWidth: 3,
-    borderTopColor: 'transparent',
+    borderTopColor: "transparent",
   },
   message: {
     marginTop: 10,
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
 });

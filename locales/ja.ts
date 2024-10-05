@@ -1,24 +1,36 @@
 export default {
+  common: {
+    loading: "読み込み中...",
+    error: "エラー",
+    close: "閉じる",
+    cancel: "キャンセル",
+    ok: "OK",
+  },
   login: {
     title: "PandA アプリ",
     ecsIdPlaceholder: "ECS-ID",
     passwordPlaceholder: "パスワード",
     loginButton: "ログイン",
     loggingInButton: "ログイン中...",
-    errorTitle: "エラー",
     errorMessage: "ECS-IDとパスワードを入力してください",
     invalidCredentials: "ECS-IDまたはパスワードが無効です",
     loginError: "ログイン中にエラーが発生しました。もう一度お試しください。",
   },
   home: {
-    title: "課題",
+    title: "ホーム",
     noAssignments: "課題が見つかりません",
-    loading: "課題を読み込み中...",
+    fetchingAssignments: "課題を取得中... (1分程度かかることがあります)",
   },
-  assignmentDetail: {
+  assignment: {
+    viewDetails: "詳細を見る",
     dueDate: "提出期限",
     description: "説明",
-    loading: "課題の詳細を読み込み中...",
+    addToCalendar: "カレンダーに追加",
+    calendarPermissionRequired:
+      "イベントを追加するにはカレンダーの許可が必要です",
+    eventAddedToCalendar: "課題がカレンダーに追加されました",
+    noCalendarFound: "デバイスにカレンダーが見つかりません",
+    failedToAddEvent: "課題をカレンダーに追加できませんでした",
   },
   settings: {
     title: "設定",
@@ -29,15 +41,14 @@ export default {
     account: "アカウント",
     logout: "ログアウト",
     logoutConfirmation: "ログアウトしてもよろしいですか？",
-    cancel: "キャンセル",
-    ok: "OK",
-    contributionDescription: "これはオープンソースプロジェクトであり、貢献を歓迎します。GitHubリポジトリを訪れて、無料で開発に貢献できます。",
-    donationDescription: "App StoreやGoogle Play Storeの開発者手数料など、開発コストをカバーするために寄付に頼っています。あなたのサポートは、アプリの維持と改善に役立ちます。",
-    contributeGithub: "GitHubで貢献する",
-    buyMeACoffee: "コーヒーを奢る",
+    contributionDescription:
+      "このプロジェクトはオープンソースプロジェクトであり、貢献を歓迎します。ぜひGitHubリポジトリを訪れてください。",
+    donationDescription:
+      "App StoreやGoogle Play Storeの開発者手数料など、開発コストをカバーするために寄付に頼っています。アプリの維持と改善のためにご協力いただければ幸いです。",
+    contributeGithub: "GitHub",
+    buyMeACoffee: "Buy me a coffee",
     selectLanguage: "言語を選択",
     notificationSettings: "通知設定",
-    close: "閉じる",
     none: "なし",
     selected: "選択済み",
   },

@@ -1,6 +1,6 @@
-import React, { useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Animated } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import React, { useEffect, useRef } from "react";
+import { View, Text, StyleSheet, Animated } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 
 interface Particle {
   x: Animated.Value;
@@ -11,7 +11,7 @@ interface Particle {
 }
 
 const NUM_PARTICLES = 30;
-const COLORS = ['#FF5252', '#FFD740', '#64FFDA', '#448AFF', '#E040FB'];
+const COLORS = ["#FF5252", "#FFD740", "#64FFDA", "#448AFF", "#E040FB"];
 
 const AuthorizedIndicator: React.FC = () => {
   const checkmarkScale = useRef(new Animated.Value(0)).current;
@@ -78,7 +78,12 @@ const AuthorizedIndicator: React.FC = () => {
   return (
     <View style={styles.container}>
       <View style={styles.content}>
-        <Animated.View style={[styles.checkmarkContainer, { transform: [{ scale: checkmarkScale }] }]}>
+        <Animated.View
+          style={[
+            styles.checkmarkContainer,
+            { transform: [{ scale: checkmarkScale }] },
+          ]}
+        >
           <Ionicons name="checkmark-circle" size={80} color="#4CAF50" />
         </Animated.View>
         <Text style={styles.text}>Authorized</Text>
@@ -94,10 +99,12 @@ const AuthorizedIndicator: React.FC = () => {
                 { translateX: particle.x },
                 { translateY: particle.y },
                 { scale: particle.scale },
-                { rotate: particle.rotation.interpolate({
-                  inputRange: [0, 360],
-                  outputRange: ['0deg', '360deg'],
-                }) },
+                {
+                  rotate: particle.rotation.interpolate({
+                    inputRange: [0, 360],
+                    outputRange: ["0deg", "360deg"],
+                  }),
+                },
               ],
             },
           ]}
@@ -110,23 +117,23 @@ const AuthorizedIndicator: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#FFFFFF",
   },
   content: {
-    alignItems: 'center',
+    alignItems: "center",
   },
   checkmarkContainer: {
     marginBottom: 16,
   },
   text: {
     fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333333',
+    fontWeight: "bold",
+    color: "#333333",
   },
   particle: {
-    position: 'absolute',
+    position: "absolute",
     width: 8,
     height: 8,
     borderRadius: 4,

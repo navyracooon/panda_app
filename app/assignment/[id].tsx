@@ -11,23 +11,25 @@ import {
 } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import * as Haptics from 'expo-haptics';
+import * as Haptics from "expo-haptics";
 import { format, differenceInDays } from "date-fns";
 import * as Calendar from "expo-calendar";
 import { useAssignments } from "../../contexts/AssignmentContext";
 import RenderHtml from "react-native-render-html";
+import { useLocalization } from "../../contexts/LocalizationContext";
 
 export default function AssignmentDetailScreen() {
   const { id } = useLocalSearchParams();
   const { assignments } = useAssignments();
   const { width } = useWindowDimensions();
+  const { t } = useLocalization();
 
   const assignment = assignments.find((a) => a.id === id);
 
   if (!assignment) {
     return (
       <View style={styles.container}>
-        <Text>Assignment not found</Text>
+        <Text>{t("common.error")}</Text>
       </View>
     );
   }
@@ -67,19 +69,16 @@ export default function AssignmentDetailScreen() {
           };
 
           await Calendar.createEventAsync(defaultCalendar.id, eventDetails);
-          Alert.alert("Assignment added to calendar");
+          Alert.alert(t("assignment.eventAddedToCalendar"));
         } else {
-          Alert.alert("Error", "No calendar found on the device");
+          Alert.alert(t("common.error"), t("assignment.noCalendarFound"));
         }
       } else {
-        Alert.alert(
-          "Permission required",
-          "Calendar permission is required to add the event",
-        );
+        Alert.alert(t("common.error"), t("assignment.calendarPermission"));
       }
     } catch (error) {
       console.error("Error adding event to calendar:", error);
-      Alert.alert("Error", "Failed to add assignment to calendar");
+      Alert.alert(t("common.error"), t("assignment.failedToAddEvent"));
     }
   };
 
@@ -93,7 +92,9 @@ export default function AssignmentDetailScreen() {
         <TouchableOpacity
           style={styles.dueDateContainer}
           onPress={handleDatePress}
-          onPressIn={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)}
+          onPressIn={() =>
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
+          }
         >
           <Ionicons name="calendar-outline" size={24} color="#000" />
           <View
@@ -110,7 +111,7 @@ export default function AssignmentDetailScreen() {
           />
         </TouchableOpacity>
         <View style={styles.descriptionContainer}>
-          <Text style={styles.sectionTitle}>Description</Text>
+          <Text style={styles.sectionTitle}>{t("assignment.description")}</Text>
           <RenderHtml
             contentWidth={width - 40}
             source={{ html: assignment.instructions }}
@@ -119,7 +120,9 @@ export default function AssignmentDetailScreen() {
         <TouchableOpacity
           style={styles.urlContainer}
           onPress={handleUrlPress}
-          onPressIn={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)}
+          onPressIn={() =>
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
+          }
         >
           <Ionicons name="link-outline" size={24} color="#007AFF" />
           <Text style={styles.url} numberOfLines={1} ellipsizeMode="tail">

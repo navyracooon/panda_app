@@ -13,50 +13,50 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import * as Haptics from 'expo-haptics';
-import * as SecureStore from 'expo-secure-store';
+import * as Haptics from "expo-haptics";
+import * as SecureStore from "expo-secure-store";
 import { grantNotificationPermission } from "../utils/notificationUtils";
+import { useLocalization } from "../contexts/LocalizationContext";
 
 const languages = [
-  { code: "en", label: "English" },
   { code: "ja", label: "日本語" },
+  { code: "en", label: "English" },
 ];
 
 const notificationOptions = [
-  { id: '7days', label: '7 days before' },
-  { id: '3days', label: '3 days before' },
-  { id: '1day', label: '1 day before' },
-  { id: '3hours', label: '3 hours before' },
-  { id: '1hour', label: '1 hour before' },
+  { id: "7days", label: "7days" },
+  { id: "3days", label: "3days" },
+  { id: "1day", label: "1day" },
+  { id: "3hours", label: "3hours" },
+  { id: "1hour", label: "1hour" },
 ];
 
 export default function SettingsScreen() {
   const router = useRouter();
-  const [language, setLanguage] = useState("en");
+  const { t, locale, setLocale } = useLocalization();
   const [showLanguageModal, setShowLanguageModal] = useState(false);
   const [showNotificationModal, setShowNotificationModal] = useState(false);
-  const [selectedNotifications, setSelectedNotifications] = useState<string[]>([]);
+  const [selectedNotifications, setSelectedNotifications] = useState<string[]>(
+    [],
+  );
 
   useEffect(() => {
     loadSettings();
-  }, []);
+  }, [locale]);
 
   const loadSettings = async () => {
-    const storedLanguage = await SecureStore.getItemAsync('userLanguage');
-    if (storedLanguage) {
-      setLanguage(storedLanguage);
-    }
-    const storedNotifications = await SecureStore.getItemAsync('selectedNotifications');
+    const storedNotifications = await SecureStore.getItemAsync(
+      "selectedNotifications",
+    );
     if (storedNotifications) {
       setSelectedNotifications(JSON.parse(storedNotifications));
     }
   };
 
   const handleLanguageChange = async (selectedLanguage: string) => {
-    setLanguage(selectedLanguage);
+    setLocale(selectedLanguage);
     setShowLanguageModal(false);
-    await SecureStore.setItemAsync('userLanguage', selectedLanguage);
-    // You might want to trigger a re-render of the app here to apply the new language
+    await SecureStore.setItemAsync("userLanguage", selectedLanguage);
   };
 
   const handleNotificationToggle = async (notificationId: string) => {
@@ -64,9 +64,12 @@ export default function SettingsScreen() {
     if (hasPermission) {
       setSelectedNotifications((prev) => {
         const newSelection = prev.includes(notificationId)
-          ? prev.filter(id => id !== notificationId)
+          ? prev.filter((id) => id !== notificationId)
           : [...prev, notificationId];
-        SecureStore.setItemAsync('selectedNotifications', JSON.stringify(newSelection));
+        SecureStore.setItemAsync(
+          "selectedNotifications",
+          JSON.stringify(newSelection),
+        );
         return newSelection;
       });
     }
@@ -80,15 +83,15 @@ export default function SettingsScreen() {
   };
 
   const handleLogout = () => {
-    Alert.alert("Logout", "Are you sure you want to logout?", [
+    Alert.alert(t("settings.logoutConfirmation"), "", [
       {
-        text: "Cancel",
+        text: t("common.cancel"),
         style: "cancel",
       },
       {
-        text: "OK",
+        text: t("common.ok"),
         onPress: async () => {
-          await SecureStore.deleteItemAsync('userCredentials');
+          await SecureStore.deleteItemAsync("userCredentials");
           router.replace("/");
         },
       },
@@ -96,11 +99,11 @@ export default function SettingsScreen() {
   };
 
   const handleBuyMeACoffee = () => {
-    Linking.openURL('https://www.buymeacoffee.com/navyracooon');
+    Linking.openURL("https://www.buymeacoffee.com/navyracooon");
   };
 
   const handleGitHubContribute = () => {
-    Linking.openURL('https://github.com/navyracooon/panda_app');
+    Linking.openURL("https://github.com/navyracooon/panda_app");
   };
 
   const renderLanguageItem = ({ item }) => (
@@ -109,7 +112,7 @@ export default function SettingsScreen() {
       onPress={() => handleLanguageChange(item.code)}
     >
       <Text style={styles.modalItemText}>{item.label}</Text>
-      {language === item.code && (
+      {locale === item.code && (
         <Ionicons name="checkmark" size={22} color="#007AFF" />
       )}
     </TouchableOpacity>
@@ -120,7 +123,9 @@ export default function SettingsScreen() {
       style={styles.modalItem}
       onPress={() => handleNotificationToggle(item.id)}
     >
-      <Text style={styles.modalItemText}>{item.label}</Text>
+      <Text style={styles.modalItemText}>
+        {t(`notificationOptions.${item.label}`)}
+      </Text>
       {selectedNotifications.includes(item.id) && (
         <Ionicons name="checkmark" size={22} color="#007AFF" />
       )}
@@ -131,7 +136,7 @@ export default function SettingsScreen() {
     <ScrollView style={styles.container}>
       <View style={styles.settingsContainer}>
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Preferences</Text>
+          <Text style={styles.sectionTitle}>{t("settings.preferences")}</Text>
           <TouchableOpacity
             style={styles.settingItem}
             onPress={() => setShowLanguageModal(true)}
@@ -143,11 +148,11 @@ export default function SettingsScreen() {
                 color="#000000"
                 style={styles.icon}
               />
-              <Text style={styles.settingLabel}>Language</Text>
+              <Text style={styles.settingLabel}>{t("settings.language")}</Text>
             </View>
             <View style={styles.settingValueContainer}>
               <Text style={styles.settingValue}>
-                {languages.find((lang) => lang.code === language)?.label}
+                {languages.find((lang) => lang.code === locale)?.label}
               </Text>
               <Ionicons name="chevron-forward" size={22} color="#000000" />
             </View>
@@ -164,11 +169,15 @@ export default function SettingsScreen() {
                 color="#000000"
                 style={styles.icon}
               />
-              <Text style={styles.settingLabel}>Notifications</Text>
+              <Text style={styles.settingLabel}>
+                {t("settings.notifications")}
+              </Text>
             </View>
             <View style={styles.settingValueContainer}>
               <Text style={styles.settingValue}>
-                {selectedNotifications.length === 0 ? "None" : `${selectedNotifications.length} selected`}
+                {selectedNotifications.length === 0
+                  ? t("settings.none")
+                  : `${selectedNotifications.length} ${t("settings.selected")}`}
               </Text>
               <Ionicons name="chevron-forward" size={22} color="#000000" />
             </View>
@@ -176,39 +185,59 @@ export default function SettingsScreen() {
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Support</Text>
+          <Text style={styles.sectionTitle}>{t("settings.support")}</Text>
           <TouchableOpacity
             style={[styles.supportButton, styles.githubButton]}
             onPress={handleGitHubContribute}
-            onPressIn={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)}
+            onPressIn={() =>
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
+            }
           >
-            <Ionicons name="logo-github" size={22} color="#24292e" style={styles.icon} />
-            <Text style={[styles.supportButtonText, styles.githubButtonText]}>Contribute on GitHub</Text>
+            <Ionicons
+              name="logo-github"
+              size={22}
+              color="#24292e"
+              style={styles.icon}
+            />
+            <Text style={[styles.supportButtonText, styles.githubButtonText]}>
+              {t("settings.contributeGithub")}
+            </Text>
           </TouchableOpacity>
           <Text style={styles.supportDescription}>
-            This is an open-source project and contributions are welcome. You can contribute to the development for free by visiting our GitHub repository.
+            {t("settings.contributionDescription")}
           </Text>
           <TouchableOpacity
             style={styles.supportButton}
             onPress={handleBuyMeACoffee}
-            onPressIn={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)}
+            onPressIn={() =>
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
+            }
           >
-            <Ionicons name="cafe-outline" size={22} color="#6F4E37" style={styles.icon} />
-            <Text style={styles.supportButtonText}>Buy me a coffee</Text>
+            <Ionicons
+              name="cafe-outline"
+              size={22}
+              color="#6F4E37"
+              style={styles.icon}
+            />
+            <Text style={styles.supportButtonText}>
+              {t("settings.buyMeACoffee")}
+            </Text>
           </TouchableOpacity>
           <Text style={styles.supportDescription}>
-            We rely on donations to cover development costs, including Apple Store and Google Play Store developer fees. Your support helps us maintain and improve the app.
+            {t("settings.donationDescription")}
           </Text>
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Account</Text>
+          <Text style={styles.sectionTitle}>{t("settings.account")}</Text>
           <TouchableOpacity
             style={styles.button}
             onPress={handleLogout}
-            onPressIn={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy)}
+            onPressIn={() =>
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy)
+            }
           >
-            <Text style={styles.buttonText}>Logout</Text>
+            <Text style={styles.buttonText}>{t("settings.logout")}</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -223,7 +252,9 @@ export default function SettingsScreen() {
           <View style={styles.modalContainer}>
             <TouchableWithoutFeedback>
               <View style={styles.modalContent}>
-                <Text style={styles.modalTitle}>Select Language</Text>
+                <Text style={styles.modalTitle}>
+                  {t("settings.selectLanguage")}
+                </Text>
                 <FlatList
                   data={languages}
                   renderItem={renderLanguageItem}
@@ -233,7 +264,9 @@ export default function SettingsScreen() {
                   style={styles.closeButton}
                   onPress={() => setShowLanguageModal(false)}
                 >
-                  <Text style={styles.closeButtonText}>Close</Text>
+                  <Text style={styles.closeButtonText}>
+                    {t("common.close")}
+                  </Text>
                 </TouchableOpacity>
               </View>
             </TouchableWithoutFeedback>
@@ -247,11 +280,15 @@ export default function SettingsScreen() {
         animationType="slide"
         onRequestClose={() => setShowNotificationModal(false)}
       >
-        <TouchableWithoutFeedback onPress={() => setShowNotificationModal(false)}>
+        <TouchableWithoutFeedback
+          onPress={() => setShowNotificationModal(false)}
+        >
           <View style={styles.modalContainer}>
             <TouchableWithoutFeedback>
               <View style={styles.modalContent}>
-                <Text style={styles.modalTitle}>Notification Settings</Text>
+                <Text style={styles.modalTitle}>
+                  {t("settings.notificationSettings")}
+                </Text>
                 <FlatList
                   data={notificationOptions}
                   renderItem={renderNotificationItem}
@@ -261,7 +298,9 @@ export default function SettingsScreen() {
                   style={styles.closeButton}
                   onPress={() => setShowNotificationModal(false)}
                 >
-                  <Text style={styles.closeButtonText}>Close</Text>
+                  <Text style={styles.closeButtonText}>
+                    {t("common.close")}
+                  </Text>
                 </TouchableOpacity>
               </View>
             </TouchableWithoutFeedback>
