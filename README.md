@@ -1,50 +1,41 @@
-# Welcome to your Expo app 👋
+# PandA Mobile
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+京都大学の授業資料・課題管理システムであるPandAのモバイルアプリ版です。  
+課題の閲覧・課題の通知機能を使うことができます。
 
-## Get started
+## 特徴 (Features)
 
-1. Install dependencies
+- 課題のリスト表示
+- 課題の通知機能
 
-   ```bash
-   npm install
-   ```
+## 貢献 (Contributing)
 
-2. Start the app
+貢献は大歓迎です！プルリクエストを通じて改善提案やバグの修正をお願いします。
 
-   ```bash
-    npx expo start
-   ```
+## ライセンス (License)
 
-In the output, you'll find options to open the app in a
+MIT License (MIT). 詳細は[LICENSE](./LICENSE)ファイルをご覧ください。
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+## 連絡先 (Contact)
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+何か質問・意見がある場合は、以下の連絡先にご連絡ください。
 
-## Get a fresh project
+- Email: navyracooon@gmail.com
+- X (Twitter): [@navyracooon](https://twitter.com/navyracooon)
 
-When you're ready, run:
+## 免責事項 (Disclaimer)
 
-```bash
-npm run reset-project
-```
+このアプリは京都大学の公式アプリではなく、学生が作成した非公式のアプリです。
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## クレジット (Credits)
 
-## Learn more
+このアプリは主に以下のオープンソースライブラリを利用しています  
+詳細は `package.json` を参照してください：
 
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+- [React Native](https://reactnative.dev/)
+- [Expo](https://expo.dev/)
+- [@react-navigation/native](https://reactnavigation.org/)
+- [@react-native-async-storage/async-storage](https://github.com/react-native-async-storage/async-storage)
+- [axios](https://axios-http.com/)
+- [react-native-render-html](https://github.com/meliorence/react-native-render-html)
+- [date-fns](https://date-fns.org/)
