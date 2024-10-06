@@ -2,29 +2,30 @@
   "expo": {
     "name": "panda_app",
     "slug": "panda_app",
-    "version": "1.0.0",
+    "version": "0.1.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "splash": {
-      "image": "./assets/images/splash.png",
-      "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
-    },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+      "supportsTablet": true,
+      "bundleIdentifier": "com.navyracooon.pandaapp",
+      "buildNumber": "0.1.0",
+      "infoPlist": {
+        "NSUserNotificationUsageDescription": "This app requires permission to send you notifications about upcoming assignments."
       }
     },
-    "web": {
-      "bundler": "metro",
-      "output": "static",
-      "favicon": "./assets/images/favicon.png"
+    "android": {
+      "package": "com.navyracooon.pandaapp",
+      "versionCode": 1,
+      "permissions": ["NOTIFICATIONS"],
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/icon.png",
+        "backgroundColor": "#ffffff"
+      }
     },
     "plugins": [
       "expo-router",
@@ -34,6 +35,9 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "privacy": "public",
+    "description": "PandAの授業資料・課題管理を簡単に行うアプリです。",
+    "owner": "navyracooon"
   }
 }
