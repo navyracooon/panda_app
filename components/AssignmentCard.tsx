@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -13,6 +13,8 @@ import * as Haptics from "expo-haptics";
 import Assignment from "../models/Assignment";
 import RenderHtml from "react-native-render-html";
 import { useLocalization } from "../contexts/LocalizationContext";
+import PandaParser from "../utils/PandaParser";
+import { useUser } from "../contexts/UserContext";
 
 type Props = {
   assignment: Assignment;
@@ -25,6 +27,18 @@ export default function AssignmentCard(props: Props) {
   const router = useRouter();
   const { width } = useWindowDimensions();
   const { t } = useLocalization();
+  const { user } = useUser();
+  const [siteTitle, setSiteTitle] = useState<string>("");
+
+  useEffect(() => {
+    const fetchSiteTitle = async () => {
+      if (user) {
+        const title = await PandaParser.getSiteTitle(assignment, user);
+        setSiteTitle(title);
+      }
+    };
+    fetchSiteTitle();
+  }, [assignment, user]);
 
   const getDueDateColor = (dueDate: Date) => {
     const daysUntilDue = differenceInDays(dueDate, new Date());
@@ -46,6 +60,9 @@ export default function AssignmentCard(props: Props) {
       onPressIn={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)}
       style={styles.card}
     >
+      <Text style={styles.siteTitle} numberOfLines={1}>
+        {siteTitle}
+      </Text>
       <View style={styles.header}>
         <View style={styles.titleContainer}>
           <View
@@ -94,6 +111,11 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
+  },
+  siteTitle: {
+    fontSize: 12,
+    color: "#666",
+    marginBottom: 8,
   },
   header: {
     flexDirection: "row",

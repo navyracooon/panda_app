@@ -33,6 +33,15 @@ export default {
     eventAddedToCalendar: "Assignment added to calendar",
     noCalendarFound: "No calendar found on the device",
     failedToAddEvent: "Failed to add assignment to calendar",
+    attachments: "Attachments",
+    noAttachments: "No attachments for this assignment",
+    notFound: "Assignment not found",
+    downloadComplete: "Download Complete",
+    downloadCompleteMessage: "The file has been downloaded successfully.",
+    share: "Share",
+    downloadError: "Download Error",
+    downloadErrorMessage:
+      "An error occurred while downloading the file. Please try again.",
   },
   settings: {
     title: "Settings",

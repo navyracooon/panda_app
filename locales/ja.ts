@@ -32,6 +32,15 @@ export default {
     eventAddedToCalendar: "課題がカレンダーに追加されました",
     noCalendarFound: "デバイスにカレンダーが見つかりません",
     failedToAddEvent: "課題をカレンダーに追加できませんでした",
+    attachments: "添付ファイル",
+    noAttachments: "この課題には添付ファイルがありません",
+    notFound: "課題が見つかりません",
+    downloadComplete: "ダウンロード完了",
+    downloadCompleteMessage: "ファイルが正常にダウンロードされました。",
+    share: "共有",
+    downloadError: "ダウンロードエラー",
+    downloadErrorMessage:
+      "ファイルのダウンロード中にエラーが発生しました。もう一度お試しください。",
   },
   settings: {
     title: "設定",
@@ -52,6 +61,12 @@ export default {
     notificationSettings: "通知設定",
     none: "なし",
     selected: "選択済み",
+    downloadComplete: "ダウンロード完了",
+    downloadCompleteMessage: "ファイルが正常にダウンロードされました。",
+    share: "共有",
+    downloadError: "ダウンロードエラー",
+    downloadErrorMessage:
+      "ファイルのダウンロード中にエラーが発生しました。もう一度お試しください。",
   },
   notificationOptions: {
     "7days": "7日前",
