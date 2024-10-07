@@ -4,44 +4,43 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  Linking,
-  TouchableOpacity,
-  Alert,
   useWindowDimensions,
+  Alert,
+  TouchableOpacity,
+  Linking,
 } from "react-native";
 import { useLocalSearchParams } from "expo-router";
+import { useAssignments } from "../../contexts/AssignmentContext";
+import AttachmentList from "../../components/AttachmentList";
+import { useLocalization } from "../../contexts/LocalizationContext";
+import RenderHtml from "react-native-render-html";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { format, differenceInDays } from "date-fns";
 import * as Calendar from "expo-calendar";
-import { useAssignments } from "../../contexts/AssignmentContext";
-import RenderHtml from "react-native-render-html";
-import { useLocalization } from "../../contexts/LocalizationContext";
 
 export default function AssignmentDetailScreen() {
   const { id } = useLocalSearchParams();
   const { assignments } = useAssignments();
-  const { width } = useWindowDimensions();
   const { t } = useLocalization();
+  const { width } = useWindowDimensions();
 
   const assignment = assignments.find((a) => a.id === id);
 
   if (!assignment) {
     return (
       <View style={styles.container}>
-        <Text>{t("common.error")}</Text>
+        <Text>{t("assignment.notFound")}</Text>
       </View>
     );
   }
 
   const getDueDateColor = (dueDate: Date) => {
     const daysUntilDue = differenceInDays(dueDate, new Date());
-    if (daysUntilDue <= 1) return "#FF3B30"; // Red for 1 day or less
-    if (daysUntilDue <= 3) return "#FFCC00"; // Yellow for 2-3 days
-    return "#34C759"; // Green for more than 3 days
+    if (daysUntilDue <= 1) return "#FF3B30";
+    if (daysUntilDue <= 3) return "#FFCC00";
+    return "#34C759";
   };
-
-  const dueDateColor = getDueDateColor(assignment.dueTime);
 
   const handleUrlPress = () => {
     Linking.openURL(
@@ -74,7 +73,10 @@ export default function AssignmentDetailScreen() {
           Alert.alert(t("common.error"), t("assignment.noCalendarFound"));
         }
       } else {
-        Alert.alert(t("common.error"), t("assignment.calendarPermission"));
+        Alert.alert(
+          t("common.error"),
+          t("assignment.calendarPermissionRequired"),
+        );
       }
     } catch (error) {
       console.error("Error adding event to calendar:", error);
@@ -98,7 +100,10 @@ export default function AssignmentDetailScreen() {
         >
           <Ionicons name="calendar-outline" size={24} color="#000" />
           <View
-            style={[styles.dueDateIndicator, { backgroundColor: dueDateColor }]}
+            style={[
+              styles.dueDateIndicator,
+              { backgroundColor: getDueDateColor(assignment.dueTime) },
+            ]}
           />
           <Text style={styles.dueDate}>
             {format(new Date(assignment.dueTime), "MMMM d, yyyy 'at' h:mm a")}
@@ -117,6 +122,7 @@ export default function AssignmentDetailScreen() {
             source={{ html: assignment.instructions }}
           />
         </View>
+        <AttachmentList attachments={assignment.attachments} />
         <TouchableOpacity
           style={styles.urlContainer}
           onPress={handleUrlPress}
@@ -179,18 +185,12 @@ const styles = StyleSheet.create({
     backgroundColor: "#F7F7F7",
     padding: 20,
     borderRadius: 12,
-    marginBottom: 24,
   },
   sectionTitle: {
     fontSize: 20,
     fontWeight: "bold",
     color: "#000",
     marginBottom: 12,
-  },
-  description: {
-    fontSize: 16,
-    color: "#333",
-    lineHeight: 24,
   },
   urlContainer: {
     flexDirection: "row",
