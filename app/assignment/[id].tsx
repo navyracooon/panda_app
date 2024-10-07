@@ -10,16 +10,16 @@ import {
   Linking,
 } from "react-native";
 import { useLocalSearchParams } from "expo-router";
-import { useAssignments } from "../../contexts/AssignmentContext";
-import AttachmentList from "../../components/AttachmentList";
-import { useLocalization } from "../../contexts/LocalizationContext";
 import RenderHtml from "react-native-render-html";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
-import { format, differenceInDays } from "date-fns";
 import * as Calendar from "expo-calendar";
-import PandaParser from "../../utils/PandaParser";
+import { format, differenceInDays } from "date-fns";
+import AttachmentList from "../../components/AttachmentList";
+import { useAssignments } from "../../contexts/AssignmentContext";
+import { useLocalization } from "../../contexts/LocalizationContext";
 import { useUser } from "../../contexts/UserContext";
+import PandaParser from "../../utils/PandaParser";
 
 export default function AssignmentDetailScreen() {
   const { id } = useLocalSearchParams();

@@ -6,6 +6,8 @@ import { useAssignments } from "../contexts/AssignmentContext";
 import Spinner from "../components/Spinner";
 import { useLocalization } from "../contexts/LocalizationContext";
 import { useUser } from "../contexts/UserContext";
+import * as SecureStore from "expo-secure-store";
+import { setupNotifications } from "../utils/notificationUtils";
 
 export default function HomeScreen() {
   const { assignments, setAssignments } = useAssignments();
@@ -38,6 +40,16 @@ export default function HomeScreen() {
           });
 
           setAssignments(sortedAssignments);
+
+          const selectedNotificationsString = await SecureStore.getItemAsync(
+            "selectedNotifications",
+          );
+          if (selectedNotificationsString) {
+            const selectedNotifications = JSON.parse(
+              selectedNotificationsString,
+            );
+            await setupNotifications(sortedAssignments, selectedNotifications);
+          }
         } else {
           throw new Error("User not found");
         }
