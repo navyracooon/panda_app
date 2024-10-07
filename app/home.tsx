@@ -2,12 +2,10 @@ import React, { useState, useEffect, useCallback } from "react";
 import { FlatList, StyleSheet, Text, View, RefreshControl } from "react-native";
 import AssignmentCard from "../components/AssignmentCard";
 import PandaParser from "../utils/PandaParser";
-import User from "../models/User";
-import * as SecureStore from "expo-secure-store";
 import { useAssignments } from "../contexts/AssignmentContext";
 import Spinner from "../components/Spinner";
 import { useLocalization } from "../contexts/LocalizationContext";
-import { setupNotifications } from "../utils/notificationUtils";
+import { useUser } from "../contexts/UserContext";
 
 export default function HomeScreen() {
   const { assignments, setAssignments } = useAssignments();
@@ -15,6 +13,7 @@ export default function HomeScreen() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { t } = useLocalization();
+  const { user, loadUser } = useUser();
 
   const fetchAssignments = useCallback(
     async (refresh = false) => {
@@ -26,33 +25,21 @@ export default function HomeScreen() {
         }
         setError(null);
 
-        const userCredentialsString =
-          await SecureStore.getItemAsync("userCredentials");
-        if (!userCredentialsString) {
-          throw new Error("User credentials not found");
+        if (!user) {
+          await loadUser();
         }
 
-        const userCredentials = JSON.parse(userCredentialsString);
-        const user = new User(userCredentials.ecsId, userCredentials.password);
+        if (user) {
+          const assignmentList = await PandaParser.getAllAssignmentInfo(user);
+          const sortedAssignments = assignmentList.sort((a, b) => {
+            const dateA = new Date(a.dueTime);
+            const dateB = new Date(b.dueTime);
+            return dateA.getTime() - dateB.getTime();
+          });
 
-        const assignmentList = await PandaParser.getAllAssignmentInfo(user);
-
-        // Sort assignments by due date (closest first)
-        const sortedAssignments = assignmentList.sort((a, b) => {
-          const dateA = new Date(a.dueTime);
-          const dateB = new Date(b.dueTime);
-          return dateA.getTime() - dateB.getTime();
-        });
-
-        setAssignments(sortedAssignments);
-
-        // Setup notifications for the fetched assignments
-        const selectedNotificationsString = await SecureStore.getItemAsync(
-          "selectedNotifications",
-        );
-        if (selectedNotificationsString) {
-          const selectedNotifications = JSON.parse(selectedNotificationsString);
-          await setupNotifications(sortedAssignments, selectedNotifications);
+          setAssignments(sortedAssignments);
+        } else {
+          throw new Error("User not found");
         }
       } catch (err) {
         console.error("Error fetching assignments:", err);
@@ -62,7 +49,7 @@ export default function HomeScreen() {
         setIsRefreshing(false);
       }
     },
-    [setAssignments, t],
+    [setAssignments, t, user, loadUser],
   );
 
   useEffect(() => {

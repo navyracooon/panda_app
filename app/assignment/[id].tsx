@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -18,14 +18,28 @@ import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { format, differenceInDays } from "date-fns";
 import * as Calendar from "expo-calendar";
+import PandaParser from "../../utils/PandaParser";
+import { useUser } from "../../contexts/UserContext";
 
 export default function AssignmentDetailScreen() {
   const { id } = useLocalSearchParams();
   const { assignments } = useAssignments();
   const { t } = useLocalization();
   const { width } = useWindowDimensions();
+  const { user } = useUser();
+  const [siteTitle, setSiteTitle] = useState<string>("");
 
   const assignment = assignments.find((a) => a.id === id);
+
+  useEffect(() => {
+    const fetchSiteTitle = async () => {
+      if (assignment && user) {
+        const title = await PandaParser.getSiteTitle(assignment, user);
+        setSiteTitle(title);
+      }
+    };
+    fetchSiteTitle();
+  }, [assignment, user]);
 
   if (!assignment) {
     return (
@@ -62,7 +76,7 @@ export default function AssignmentDetailScreen() {
           const eventDetails = {
             title: assignment.title,
             startDate: assignment.dueTime,
-            endDate: new Date(assignment.dueTime.getTime() + 60 * 60 * 1000), // 1 hour duration
+            endDate: new Date(assignment.dueTime.getTime() + 60 * 60 * 1000),
             notes: assignment.instructions,
             timeZone: "GMT",
           };
@@ -90,6 +104,7 @@ export default function AssignmentDetailScreen() {
       contentContainerStyle={styles.scrollContent}
     >
       <View style={styles.contentContainer}>
+        <Text style={styles.siteTitle}>{siteTitle}</Text>
         <Text style={styles.title}>{assignment.title}</Text>
         <TouchableOpacity
           style={styles.dueDateContainer}
@@ -150,7 +165,11 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     padding: 20,
-    paddingTop: 40,
+  },
+  siteTitle: {
+    fontSize: 16,
+    color: "#666",
+    marginBottom: 10,
   },
   title: {
     fontSize: 28,

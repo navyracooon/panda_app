@@ -77,8 +77,7 @@ export default class PandaParser {
     const lt = URLParser.getInputValueByName(response.data, "lt");
     const execution = URLParser.getInputValueByName(response.data, "execution");
 
-    // ltやexecutionが取得できないのはログイン済みの時であるため
-    // TODO: 適切な処理とは思えないので要検討
+    // ltやexecutionが取得できないのはログイン済みの時であるため．他の方法があれば採用
     if (!lt || !execution) {
       return;
     }
@@ -105,6 +104,53 @@ export default class PandaParser {
       throw new Error(
         `Failed to login with provided credentials. username: ${user.username}.`,
       );
+    }
+  }
+
+  static async getSiteTitle(
+    assignment: Assignment,
+    user: User,
+  ): Promise<string> {
+    const assignmentPageUrl = `https://panda.ecs.kyoto-u.ac.jp/portal/site/${assignment.context}`;
+
+    try {
+      const response = await user.session.get(assignmentPageUrl);
+      const html = response.data;
+
+      const portalScriptContent = URLParser.getScriptContentByPattern(
+        html,
+        /var\s+portal\s*=/,
+      );
+
+      if (portalScriptContent) {
+        const portalVarMatch = portalScriptContent.match(
+          /var\s+portal\s*=\s*({[\s\S]*?});/,
+        );
+        if (portalVarMatch && portalVarMatch[1]) {
+          let portalVarContent = portalVarMatch[1];
+
+          const siteTitleMatch = portalVarContent.match(
+            /"siteTitle"\s*:\s*"([^"]+)"/,
+          );
+          if (siteTitleMatch && siteTitleMatch[1]) {
+            return siteTitleMatch[1];
+          } else {
+            console.error('"siteTitle" が見つかりませんでした。');
+            throw new Error('"siteTitle" が見つかりませんでした。');
+          }
+        } else {
+          console.error('"portal"変数の内容が見つかりませんでした。');
+          throw new Error('"portal"変数が見つかりませんでした。');
+        }
+      } else {
+        console.error('"portal"変数を含む<script>タグが見つかりませんでした。');
+        throw new Error(
+          '"portal"変数を含む<script>タグが見つかりませんでした。',
+        );
+      }
+    } catch (err) {
+      console.error("siteTitle の取得中にエラーが発生しました:", err);
+      throw err;
     }
   }
 }
