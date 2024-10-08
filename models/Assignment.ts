@@ -1,4 +1,5 @@
 import Attachment from "./Attachment";
+import Site from "./Site";
 
 export default class Assignment {
   constructor(
@@ -12,6 +13,7 @@ export default class Assignment {
     public authorLastModified: string,
     public closeTime: Date,
     public closeTimeString: string,
+    public content: any,
     public context: string,
     public creator: string,
     public draft: boolean,
@@ -23,6 +25,7 @@ export default class Assignment {
     public gradeScaleMaxPoints: string,
     public gradebookItemId: number,
     public gradebookItemName: string,
+    public groups: string[],
     public id: string,
     public instructions: string,
     public ltiGradableLaunch: string,
@@ -34,13 +37,13 @@ export default class Assignment {
     public privateNoteText: string,
     public section: string,
     public status: string,
+    public submissions: any[],
     public submissionType: string,
     public timeCreated: Date,
     public timeLastModified: Date,
     public title: string,
-    public entityReference: string,
-    public entityURL: string,
-    public entityId: string,
-    public entityTitle: string,
+
+    // AssignmentのAPIからは取得できない
+    public site?: Site,
   ) {}
 }

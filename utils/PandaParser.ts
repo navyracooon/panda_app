@@ -1,156 +1,98 @@
-import URLParser from "./URLParser";
-import User from "../models/User";
 import Assignment from "../models/Assignment";
 import Attachment from "../models/Attachment";
+import Site from "../models/Site";
 
 export default class PandaParser {
-  static async getAllAssignmentInfo(user: User): Promise<Assignment[]> {
-    await PandaParser.loginPanda(user);
-    const allAssignmentInfoUrl =
-      "https://panda.ecs.kyoto-u.ac.jp/direct/assignment/my.json";
-    const response = await user.session.get(allAssignmentInfoUrl);
-
-    const assignmentList = response.data["assignment_collection"].map(
-      (responseAssignment: any) => {
-        return new Assignment(
-          responseAssignment.access,
-          responseAssignment.allPurposeItemText,
-          responseAssignment.allowPeerAssessment,
-          responseAssignment.allowResubmission,
-          responseAssignment.anonymousGrading,
-          responseAssignment.attachments.map(
-            (attachment: any) =>
-              new Attachment(
-                attachment.name,
-                attachment.ref,
-                attachment.size,
-                attachment.type,
-                attachment.url,
-              ),
-          ),
-          responseAssignment.author,
-          responseAssignment.authorLastModified,
-          new Date(responseAssignment.closeTime.epochSecond * 1000),
-          responseAssignment.closeTimeString,
-          responseAssignment.context,
-          responseAssignment.creator,
-          responseAssignment.draft,
-          new Date(responseAssignment.dropDeadTime.epochSecond * 1000),
-          responseAssignment.dropDeadTimeString,
-          new Date(responseAssignment.dueTime.epochSecond * 1000),
-          responseAssignment.dueTimeString,
-          responseAssignment.gradeScale,
-          responseAssignment.gradeScaleMaxPoints,
-          responseAssignment.gradebookItemId,
-          responseAssignment.gradebookItemName,
-          responseAssignment.id,
-          responseAssignment.instructions,
-          responseAssignment.ltiGradableLaunch,
-          responseAssignment.maxGradePoint,
-          responseAssignment.modelAnswerText,
-          new Date(responseAssignment.openTime.epochSecond * 1000),
-          responseAssignment.openTimeString,
-          responseAssignment.position,
-          responseAssignment.privateNoteText,
-          responseAssignment.section,
-          responseAssignment.status,
-          responseAssignment.submissionType,
-          new Date(responseAssignment.timeCreated.epochSecond * 1000),
-          new Date(responseAssignment.timeLastModified.epochSecond * 1000),
-          responseAssignment.title,
-          responseAssignment.entityReference,
-          responseAssignment.entityURL,
-          responseAssignment.entityId,
-          responseAssignment.entityTitle,
-        );
-      },
+  static parseAssignment(data: any): Assignment {
+    return new Assignment(
+      data.access,
+      data.allPurposeItemText,
+      data.allowPeerAssessment,
+      data.allowResubmission,
+      data.anonymousGrading,
+      data.attachments.map((attachment: any) =>
+        PandaParser.parseAttachment(attachment),
+      ),
+      data.author,
+      data.authorLastModified,
+      new Date(data.closeTime.epochSecond * 1000),
+      data.closeTimeString,
+      data.content,
+      data.context,
+      data.creator,
+      data.draft,
+      new Date(data.dropDeadTime.epochSecond * 1000),
+      data.dropDeadTimeString,
+      new Date(data.dueTime.epochSecond * 1000),
+      data.dueTimeString,
+      data.gradeScale,
+      data.gradeScaleMaxPoints,
+      data.gradebookItemId,
+      data.gradebookItemName,
+      data.groups,
+      data.id,
+      data.instructions,
+      data.ltiGradableLaunch,
+      data.maxGradePoint,
+      data.modelAnswerText,
+      new Date(data.openTime.epochSecond * 1000),
+      data.openTimeString,
+      data.position,
+      data.privateNoteText,
+      data.section,
+      data.status,
+      data.submissions,
+      data.submissionType,
+      new Date(data.timeCreated.epochSecond * 1000),
+      new Date(data.timeLastModified.epochSecond * 1000),
+      data.title,
     );
-
-    return assignmentList;
   }
 
-  static async loginPanda(user: User): Promise<void> {
-    const loginUrl =
-      "https://panda.ecs.kyoto-u.ac.jp/cas/login?service=https%3A%2F%2Fpanda.ecs.kyoto-u.ac.jp%2Fsakai-login-tool%2Fcontainer";
-
-    const response = await user.session.get(loginUrl);
-    const lt = URLParser.getInputValueByName(response.data, "lt");
-    const execution = URLParser.getInputValueByName(response.data, "execution");
-
-    // ltやexecutionが取得できないのはログイン済みの時であるため．他の方法があれば採用
-    if (!lt || !execution) {
-      return;
-    }
-
-    const formData = new URLSearchParams();
-    formData.append("username", user.username);
-    formData.append("password", user.password);
-    formData.append("lt", lt);
-    formData.append("execution", execution);
-    formData.append("_eventId", "submit");
-
-    const loginResponse = await user.session.post(
-      loginUrl,
-      formData.toString(),
-      {
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-      },
-    );
-
-    const errorMessage = '<div id="msg" class="errors">';
-    if (loginResponse.data.includes(errorMessage)) {
-      throw new Error(
-        `Failed to login with provided credentials. username: ${user.username}.`,
-      );
-    }
+  static parseAttachment(data: any): Attachment {
+    return new Attachment(data.name, data.ref, data.size, data.type, data.url);
   }
 
-  static async getSiteTitle(
-    assignment: Assignment,
-    user: User,
-  ): Promise<string> {
-    const assignmentPageUrl = `https://panda.ecs.kyoto-u.ac.jp/portal/site/${assignment.context}`;
-
-    try {
-      const response = await user.session.get(assignmentPageUrl);
-      const html = response.data;
-
-      const portalScriptContent = URLParser.getScriptContentByPattern(
-        html,
-        /var\s+portal\s*=/,
-      );
-
-      if (portalScriptContent) {
-        const portalVarMatch = portalScriptContent.match(
-          /var\s+portal\s*=\s*({[\s\S]*?});/,
-        );
-        if (portalVarMatch && portalVarMatch[1]) {
-          let portalVarContent = portalVarMatch[1];
-
-          const siteTitleMatch = portalVarContent.match(
-            /"siteTitle"\s*:\s*"([^"]+)"/,
-          );
-          if (siteTitleMatch && siteTitleMatch[1]) {
-            return siteTitleMatch[1];
-          } else {
-            console.error('"siteTitle" が見つかりませんでした。');
-            throw new Error('"siteTitle" が見つかりませんでした。');
-          }
-        } else {
-          console.error('"portal"変数の内容が見つかりませんでした。');
-          throw new Error('"portal"変数が見つかりませんでした。');
-        }
-      } else {
-        console.error('"portal"変数を含む<script>タグが見つかりませんでした。');
-        throw new Error(
-          '"portal"変数を含む<script>タグが見つかりませんでした。',
-        );
-      }
-    } catch (err) {
-      console.error("siteTitle の取得中にエラーが発生しました:", err);
-      throw err;
-    }
+  static parseSite(data: any): Site {
+    return new Site(
+      data.activeEdit,
+      data.contactEmail,
+      data.contactName,
+      new Date(data.createdDate),
+      data.customPageOrdered,
+      data.description,
+      data.empty,
+      data.htmlDescription,
+      data.htmlShortDescription,
+      data.iconUrl,
+      data.iconUrlFull,
+      data.id,
+      data.infoUrl,
+      data.infoUrlFull,
+      data.joinable,
+      data.joinerRole,
+      data.lastModified,
+      data.maintainRole,
+      new Date(data.modifiedDate),
+      data.owner,
+      data.props,
+      data.providerGroupId,
+      data.pubView,
+      data.published,
+      data.realmLock,
+      data.realmLocks,
+      data.reference,
+      data.shortDescription,
+      data.siteGroups,
+      data.siteGroupsList,
+      data.siteOwner,
+      data.sitePages,
+      data.skin,
+      data.softlyDeleted,
+      new Date(data.softlyDeletedDate),
+      data.title,
+      data.type,
+      data.userRoles,
+    );
   }
 }

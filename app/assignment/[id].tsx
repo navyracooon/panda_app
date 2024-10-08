@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
   View,
   Text,
@@ -18,28 +18,14 @@ import { format, differenceInDays } from "date-fns";
 import AttachmentList from "../../components/AttachmentList";
 import { useAssignments } from "../../contexts/AssignmentContext";
 import { useLocalization } from "../../contexts/LocalizationContext";
-import { useUser } from "../../contexts/UserContext";
-import PandaParser from "../../utils/PandaParser";
 
 export default function AssignmentDetailScreen() {
   const { id } = useLocalSearchParams();
   const { assignments } = useAssignments();
   const { t } = useLocalization();
   const { width } = useWindowDimensions();
-  const { user } = useUser();
-  const [siteTitle, setSiteTitle] = useState<string>("");
 
   const assignment = assignments.find((a) => a.id === id);
-
-  useEffect(() => {
-    const fetchSiteTitle = async () => {
-      if (assignment && user) {
-        const title = await PandaParser.getSiteTitle(assignment, user);
-        setSiteTitle(title);
-      }
-    };
-    fetchSiteTitle();
-  }, [assignment, user]);
 
   if (!assignment) {
     return (
@@ -104,7 +90,7 @@ export default function AssignmentDetailScreen() {
       contentContainerStyle={styles.scrollContent}
     >
       <View style={styles.contentContainer}>
-        <Text style={styles.siteTitle}>{siteTitle}</Text>
+        <Text style={styles.siteTitle}>{assignment.site?.title}</Text>
         <Text style={styles.title}>{assignment.title}</Text>
         <TouchableOpacity
           style={styles.dueDateContainer}

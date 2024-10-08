@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { FlatList, StyleSheet, Text, View, RefreshControl } from "react-native";
 import AssignmentCard from "../components/AssignmentCard";
-import PandaParser from "../utils/PandaParser";
+import PandaUtils from "../utils/PandaUtils";
 import { useAssignments } from "../contexts/AssignmentContext";
 import Spinner from "../components/Spinner";
 import { useLocalization } from "../contexts/LocalizationContext";
@@ -32,7 +32,7 @@ export default function HomeScreen() {
         }
 
         if (user) {
-          const assignmentList = await PandaParser.getAllAssignmentInfo(user);
+          const assignmentList = await PandaUtils.getAllAssignments(user);
           const sortedAssignments = assignmentList.sort((a, b) => {
             const dateA = new Date(a.dueTime);
             const dateB = new Date(b.dueTime);

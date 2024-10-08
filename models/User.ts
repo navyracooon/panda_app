@@ -1,5 +1,5 @@
 import axios, { AxiosInstance } from "axios";
-import PandaParser from "../utils/PandaParser";
+import PandaUtils from "../utils/PandaUtils";
 
 export default class User {
   username: string;
@@ -20,7 +20,7 @@ export default class User {
   async checkLogin(): Promise<boolean> {
     try {
       this.resetSession();
-      await PandaParser.loginPanda(this);
+      await PandaUtils.loginPanda(this);
       return true;
     } catch (error) {
       console.error(error);
