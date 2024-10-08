@@ -14,10 +14,9 @@ import {
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import * as SecureStore from "expo-secure-store";
 import * as Haptics from "expo-haptics";
-import User from "../models/User";
 import { grantNotificationPermission } from "../utils/notificationUtils";
+import { useUser } from "../contexts/UserContext";
 
 const { width } = Dimensions.get("window");
 
@@ -25,6 +24,7 @@ export default function LoginScreen() {
   const [ecsId, setEcsId] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const { login } = useUser();
   const router = useRouter();
   const scaleAnim = useRef(new Animated.Value(1)).current;
 
@@ -39,21 +39,15 @@ export default function LoginScreen() {
     }
 
     setIsLoading(true);
-    const user = new User(ecsId, password);
 
     try {
-      const isValid = await user.checkLogin();
-      if (isValid) {
-        await SecureStore.setItemAsync(
-          "userCredentials",
-          JSON.stringify({ ecsId, password }),
-        );
+      const loginStatus = await login(ecsId, password);
+      if (loginStatus) {
         router.replace("/home");
       } else {
         Alert.alert("Error", "Invalid ECS-ID or password");
       }
-    } catch (error) {
-      console.error("Login error:", error);
+    } catch {
       Alert.alert("Error", "An error occurred during login. Please try again.");
     } finally {
       setIsLoading(false);

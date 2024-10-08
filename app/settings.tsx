@@ -21,8 +21,9 @@ import {
   grantNotificationPermission,
   setupNotifications,
 } from "../utils/notificationUtils";
-import { useLocalization } from "../contexts/LocalizationContext";
 import { useAssignments } from "../contexts/AssignmentContext";
+import { useLocalization } from "../contexts/LocalizationContext";
+import { useUser } from "../contexts/UserContext";
 
 const languages = [
   { code: "ja", label: "日本語" },
@@ -47,6 +48,7 @@ export default function SettingsScreen() {
     [],
   );
   const [refreshing, setRefreshing] = useState(false);
+  const { logout } = useUser();
 
   const loadSettings = useCallback(async () => {
     const storedLanguage = await SecureStore.getItemAsync("userLanguage");
@@ -119,7 +121,7 @@ export default function SettingsScreen() {
       {
         text: t("common.ok"),
         onPress: async () => {
-          await SecureStore.deleteItemAsync("userCredentials");
+          await logout();
           router.replace("/");
         },
       },
