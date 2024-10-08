@@ -16,7 +16,6 @@ import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import * as SecureStore from "expo-secure-store";
-import * as Localization from "expo-localization";
 import {
   grantNotificationPermission,
   setupNotifications,
@@ -51,23 +50,13 @@ export default function SettingsScreen() {
   const { logout } = useUser();
 
   const loadSettings = useCallback(async () => {
-    const storedLanguage = await SecureStore.getItemAsync("userLanguage");
-    if (storedLanguage) {
-      setLocale(storedLanguage);
-    } else {
-      const deviceLocale = Localization.locale.split("-")[0];
-      const initialLocale = deviceLocale === "ja" ? "ja" : "en";
-      setLocale(initialLocale);
-      await SecureStore.setItemAsync("userLanguage", initialLocale);
-    }
-
     const storedNotifications = await SecureStore.getItemAsync(
       "selectedNotifications",
     );
     if (storedNotifications) {
       setSelectedNotifications(JSON.parse(storedNotifications));
     }
-  }, [setLocale]);
+  }, []);
 
   useEffect(() => {
     loadSettings();

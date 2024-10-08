@@ -1,3 +1,2 @@
 npm run format
-npx eslint . --fix
 npm run lint

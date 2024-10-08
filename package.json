@@ -10,7 +10,7 @@
     "web": "expo start --web",
     "test": "jest --watchAll --env-file=.env",
     "lint": "expo lint",
-    "format": "prettier . --write",
+    "format": "npx eslint . --fix --quiet; prettier . --write",
     "prepare": "husky"
   },
   "jest": {
