@@ -6,6 +6,7 @@ import React, {
   PropsWithChildren,
 } from "react";
 import * as Localization from "expo-localization";
+import * as SecureStore from "expo-secure-store";
 import { I18n } from "i18n-js";
 import en from "../locales/en";
 import ja from "../locales/ja";
@@ -34,6 +35,22 @@ export const LocalizationProvider: React.FC<PropsWithChildren> = ({
   children,
 }) => {
   const [locale, setLocale] = useState(Localization.locale);
+
+  useEffect(() => {
+    const initializeLocale = async () => {
+      const storedLanguage = await SecureStore.getItemAsync("userLanguage");
+
+      if (storedLanguage) {
+        setLocale(storedLanguage);
+      } else {
+        const deviceLocale = Localization.locale.split("-")[0];
+        const initialLocale = deviceLocale === "ja" ? "ja" : "en";
+        setLocale(initialLocale);
+        await SecureStore.setItemAsync("userLanguage", initialLocale);
+      }
+    };
+    initializeLocale();
+  }, []);
 
   useEffect(() => {
     i18n.locale = locale;

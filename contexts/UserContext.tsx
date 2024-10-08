@@ -5,7 +5,8 @@ import User from "../models/User";
 interface UserContextType {
   user: User | null;
   setUser: (user: User | null) => void;
-  loadUser: () => Promise<void>;
+  login: (ecsId: string, password: string) => Promise<boolean>;
+  loadUser: () => Promise<boolean>;
   logout: () => Promise<void>;
 }
 
@@ -16,16 +17,43 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [user, setUser] = useState<User | null>(null);
 
+  const login = async (ecsId: string, password: string) => {
+    const user = new User(ecsId, password);
+
+    try {
+      const isValid = await user.checkLogin();
+      if (isValid) {
+        await SecureStore.setItemAsync(
+          "userCredentials",
+          JSON.stringify({ ecsId, password }),
+        );
+        setUser(user);
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error("Error while logging in:", error);
+      return false;
+    }
+  };
+
   const loadUser = async () => {
     try {
       const userCredentialsString =
         await SecureStore.getItemAsync("userCredentials");
       if (userCredentialsString) {
         const userCredentials = JSON.parse(userCredentialsString);
-        setUser(new User(userCredentials.ecsId, userCredentials.password));
+        const user = new User(userCredentials.ecsId, userCredentials.password);
+        const isValid = await user.checkLogin();
+        if (isValid) {
+          setUser(user);
+          return true;
+        }
       }
+      return false;
     } catch (error) {
       console.error("Error loading user credentials:", error);
+      return false;
     }
   };
 
@@ -43,7 +71,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
   }, []);
 
   return (
-    <UserContext.Provider value={{ user, setUser, loadUser, logout }}>
+    <UserContext.Provider value={{ user, setUser, login, loadUser, logout }}>
       {children}
     </UserContext.Provider>
   );

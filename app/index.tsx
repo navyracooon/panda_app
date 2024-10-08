@@ -1,9 +1,8 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useRouter, useRootNavigationState } from "expo-router";
 import { View, StyleSheet } from "react-native";
-import * as SecureStore from "expo-secure-store";
-import User from "../models/User";
 import Spinner from "../components/Spinner";
+import { useUser } from "../contexts/UserContext";
 import { useLocalization } from "../contexts/LocalizationContext";
 
 export default function Index() {
@@ -11,21 +10,12 @@ export default function Index() {
   const navigationState = useRootNavigationState();
   const [isChecking, setIsChecking] = useState(true);
   const { t } = useLocalization();
+  const { loadUser } = useUser();
 
   const checkLoginStatus = useCallback(async () => {
     try {
-      const userCredentialsString =
-        await SecureStore.getItemAsync("userCredentials");
-      if (!userCredentialsString) {
-        router.replace("/login");
-        return;
-      }
-
-      const userCredentials = JSON.parse(userCredentialsString);
-      const user = new User(userCredentials.ecsId, userCredentials.password);
-
-      const isLoggedIn = await user.checkLogin();
-      if (isLoggedIn) {
+      const loadUserStatus = await loadUser();
+      if (loadUserStatus) {
         router.replace("/home");
       } else {
         router.replace("/login");
@@ -36,7 +26,7 @@ export default function Index() {
     } finally {
       setIsChecking(false);
     }
-  }, [router]);
+  }, [loadUser, router]);
 
   useEffect(() => {
     if (!navigationState?.key) {
