@@ -11,8 +11,8 @@
 ## スクリーンショット (Screenshots)
 
 <div style="display:flex;">
-  <img src="docs/IMG_1045.PNG" alt="ホーム画面" height="600">
-  <img src="docs/IMG_1046.PNG" alt="課題詳細" height="600">
+  <img src="docs/home.png" alt="ホーム画面" height="600">
+  <img src="docs/detail.png" alt="課題詳細" height="600">
 </p>
 
 ## 貢献 (Contributing)
