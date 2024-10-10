@@ -42,7 +42,7 @@ export const getDeviceToken = async (): Promise<string | null> => {
 export const scheduleNotification = async (
   assignment: Assignment,
   notificationTiming: string,
-): Promise<string> => {
+): Promise<void> => {
   const dueDate = new Date(assignment.dueTime);
   let notificationDate = new Date(dueDate);
 
@@ -64,23 +64,20 @@ export const scheduleNotification = async (
       break;
   }
 
-  const trigger = notificationDate;
+  const now = new Date();
+  if (notificationDate <= now) {
+    return;
+  }
 
-  const notificationId = await Notifications.scheduleNotificationAsync({
+  await Notifications.scheduleNotificationAsync({
     content: {
       title: `Assignment Due Soon: ${assignment.title}`,
       body: `Your assignment "${assignment.title}" is due ${notificationTiming} from now.`,
     },
-    trigger,
+    trigger: notificationDate,
   });
 
-  return notificationId;
-};
-
-export const cancelNotification = async (
-  notificationId: string,
-): Promise<void> => {
-  await Notifications.cancelScheduledNotificationAsync(notificationId);
+  return;
 };
 
 export const setupNotifications = async (
@@ -90,10 +87,8 @@ export const setupNotifications = async (
   const hasPermission = await grantNotificationPermission(true);
   if (!hasPermission) return;
 
-  // Cancel all existing notifications
   await Notifications.cancelAllScheduledNotificationsAsync();
 
-  // Schedule new notifications for each assignment and selected timing
   for (const assignment of assignments) {
     for (const timing of selectedNotifications) {
       await scheduleNotification(assignment, timing);
