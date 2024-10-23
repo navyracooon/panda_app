@@ -72,47 +72,39 @@ export default function HomeScreen() {
     fetchAssignments(true);
   }, [fetchAssignments]);
 
-  if (isLoading) {
-    return (
-      <View style={styles.centerContainer}>
-        <Spinner
-          size={40}
-          color="#000"
-          message={t("home.fetchingAssignments")}
-        />
-      </View>
-    );
-  }
-
-  if (error) {
-    return (
-      <View style={styles.centerContainer}>
-        <Text style={styles.errorText}>
-          {t("common.error")}: {error}
-        </Text>
-      </View>
-    );
-  }
-
   return (
     <View style={styles.container}>
-      <FlatList
-        data={assignments}
-        renderItem={({ item }) => <AssignmentCard assignment={item} />}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.listContent}
-        ListEmptyComponent={
-          <Text style={styles.emptyText}>{t("home.noAssignments")}</Text>
-        }
-        refreshControl={
-          <RefreshControl
-            refreshing={isRefreshing}
-            onRefresh={handleRefresh}
-            colors={["#000"]}
-            tintColor="#000"
+      {isLoading ? (
+        <View style={styles.centerContainer}>
+          <Spinner
+            size={40}
+            color="#000"
+            message={t("home.fetchingAssignments")}
           />
-        }
-      />
+        </View>
+      ) : (
+        <FlatList
+          data={assignments}
+          renderItem={({ item }) => <AssignmentCard assignment={item} />}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={styles.listContent}
+          ListEmptyComponent={
+            <Text style={styles.emptyText}>
+              {error
+                ? `${t("common.error")}: ${error}`
+                : t("home.noAssignments")}
+            </Text>
+          }
+          refreshControl={
+            <RefreshControl
+              refreshing={isRefreshing}
+              onRefresh={handleRefresh}
+              colors={["#000"]}
+              tintColor="#000"
+            />
+          }
+        />
+      )}
     </View>
   );
 }
@@ -132,11 +124,6 @@ const styles = StyleSheet.create({
   listContent: {
     paddingHorizontal: 16,
     paddingBottom: 20,
-  },
-  errorText: {
-    color: "red",
-    fontSize: 16,
-    textAlign: "center",
   },
   emptyText: {
     fontSize: 16,

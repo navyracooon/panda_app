@@ -10,4 +10,13 @@ export default class URLParser {
     const valueMatch = match[0].match(valueRegex);
     return valueMatch ? valueMatch[1] : null;
   }
+
+  static getDivContentByClass(html: string, className: string): string | null {
+    const divRegex = new RegExp(
+      `<div[^>]*class=['"]([^'"]*\\b${className}\\b[^'"]*)['"][^>]*>(.*?)</div>`,
+      "is",
+    );
+    const match = html.match(divRegex);
+    return match ? match[2].trim() : null;
+  }
 }

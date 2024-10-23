@@ -33,8 +33,6 @@ export default function AssignmentCard(props: Props) {
     return "#34C759";
   };
 
-  const dueDateColor = getDueDateColor(assignment.dueTime);
-
   const truncateHtml = (html: string, maxLength: number) => {
     if (html.length <= maxLength) return html;
     return html.substring(0, maxLength) + "...";
@@ -52,7 +50,10 @@ export default function AssignmentCard(props: Props) {
       <View style={styles.header}>
         <View style={styles.titleContainer}>
           <View
-            style={[styles.dueDateIndicator, { backgroundColor: dueDateColor }]}
+            style={[
+              styles.dueDateIndicator,
+              { backgroundColor: getDueDateColor(assignment.dueTime) },
+            ]}
           />
           <Text style={styles.title} numberOfLines={1}>
             {assignment.title}
@@ -61,7 +62,7 @@ export default function AssignmentCard(props: Props) {
         <View style={styles.dueDateContainer}>
           <Ionicons name="time-outline" size={16} color="#007AFF" />
           <Text style={styles.dueDate}>
-            {format(assignment.dueTime, "MMM d 'at' h:mm a")}
+            {format(assignment.dueTime, "MMM d 'at' H:mm")}
           </Text>
         </View>
       </View>

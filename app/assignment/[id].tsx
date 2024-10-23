@@ -107,7 +107,7 @@ export default function AssignmentDetailScreen() {
             ]}
           />
           <Text style={styles.dueDate}>
-            {format(new Date(assignment.dueTime), "MMMM d, yyyy 'at' h:mm a")}
+            {format(assignment.dueTime, "MMM d 'at' H:mm")}
           </Text>
           <Ionicons
             name="add-circle-outline"

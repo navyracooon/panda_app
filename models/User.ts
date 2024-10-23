@@ -13,13 +13,8 @@ export default class User {
     this.session = axios.create({ withCredentials: true });
   }
 
-  resetSession() {
-    this.session = axios.create({ withCredentials: true });
-  }
-
   async checkLogin(): Promise<boolean> {
     try {
-      this.resetSession();
       await PandaUtils.loginPanda(this);
       return true;
     } catch (error) {
