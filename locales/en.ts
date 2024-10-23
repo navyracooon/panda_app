@@ -54,10 +54,7 @@ export default {
     logoutConfirmation: "Are you sure you want to logout?",
     contributionDescription:
       "This is an open-source project and contributions are welcome. You can contribute to the development for free by visiting our GitHub repository.",
-    donationDescription:
-      "We rely on donations to cover development costs, including Apple Store and Google Play Store developer fees. Your support helps us maintain and improve the app.",
     contributeGithub: "Contribute on GitHub",
-    buyMeACoffee: "Buy me a coffee",
     selectLanguage: "Select Language",
     notificationSettings: "Notification Settings",
     none: "None",
