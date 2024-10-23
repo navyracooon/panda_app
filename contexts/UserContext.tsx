@@ -1,6 +1,7 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
 import * as SecureStore from "expo-secure-store";
 import User from "../models/User";
+import PandaUtils from "../utils/PandaUtils";
 
 interface UserContextType {
   user: User | null;
@@ -43,12 +44,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
         await SecureStore.getItemAsync("userCredentials");
       if (userCredentialsString) {
         const userCredentials = JSON.parse(userCredentialsString);
-        const user = new User(userCredentials.ecsId, userCredentials.password);
-        const isValid = await user.checkLogin();
-        if (isValid) {
-          setUser(user);
-          return true;
-        }
+        setUser(new User(userCredentials.ecsId, userCredentials.password));
+        return true;
       }
       return false;
     } catch (error) {
@@ -59,8 +56,11 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const logout = async () => {
     try {
-      await SecureStore.deleteItemAsync("userCredentials");
-      setUser(null);
+      if (user) {
+        PandaUtils.logoutPanda(user);
+        await SecureStore.deleteItemAsync("userCredentials");
+        setUser(null);
+      }
     } catch (error) {
       console.error("Error during logout:", error);
     }

@@ -11,7 +11,7 @@ export default class PandaParser {
       data.allowResubmission,
       data.anonymousGrading,
       data.attachments.map((attachment: any) =>
-        PandaParser.parseAttachment(attachment),
+        this.parseAttachment(attachment),
       ),
       data.author,
       data.authorLastModified,
