@@ -151,22 +151,20 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     padding: 20,
+    gap: 20,
   },
   siteTitle: {
     fontSize: 16,
     color: "#666",
-    marginBottom: 10,
   },
   title: {
     fontSize: 28,
     fontWeight: "bold",
     color: "#000",
-    marginBottom: 20,
   },
   dueDateContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 24,
     backgroundColor: "#F7F7F7",
     padding: 16,
     borderRadius: 12,

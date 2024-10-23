@@ -116,8 +116,6 @@ export default function AttachmentList({
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 24,
-    marginBottom: 24,
     backgroundColor: "#F7F7F7",
     borderRadius: 12,
     padding: 20,
