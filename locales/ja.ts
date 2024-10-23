@@ -53,10 +53,7 @@ export default {
     logoutConfirmation: "ログアウトしてもよろしいですか？",
     contributionDescription:
       "このプロジェクトはオープンソースプロジェクトであり、貢献を歓迎します。ぜひGitHubリポジトリを訪れてください。",
-    donationDescription:
-      "App StoreやGoogle Play Storeの開発者手数料など、開発コストをカバーするために寄付に頼っています。アプリの維持と改善のためにご協力いただければ幸いです。",
     contributeGithub: "GitHub",
-    buyMeACoffee: "Buy me a coffee",
     selectLanguage: "言語を選択",
     notificationSettings: "通知設定",
     none: "なし",

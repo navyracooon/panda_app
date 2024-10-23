@@ -24,12 +24,22 @@ import { useAssignments } from "../contexts/AssignmentContext";
 import { useLocalization } from "../contexts/LocalizationContext";
 import { useUser } from "../contexts/UserContext";
 
-const languages = [
+type LanguageOption = {
+  code: string;
+  label: string;
+};
+
+type NotificationOption = {
+  id: string;
+  label: string;
+};
+
+const languages: LanguageOption[] = [
   { code: "ja", label: "日本語" },
   { code: "en", label: "English" },
 ];
 
-const notificationOptions = [
+const notificationOptions: NotificationOption[] = [
   { id: "7days", label: "7days" },
   { id: "3days", label: "3days" },
   { id: "1day", label: "1day" },
@@ -86,7 +96,6 @@ export default function SettingsScreen() {
           JSON.stringify(newSelection),
         );
 
-        // Setup notifications with the new selection
         setupNotifications(assignments, newSelection);
 
         return newSelection;
@@ -117,15 +126,11 @@ export default function SettingsScreen() {
     ]);
   };
 
-  const handleBuyMeACoffee = () => {
-    Linking.openURL("https://www.buymeacoffee.com/navyracooon");
-  };
-
   const handleGitHubContribute = () => {
     Linking.openURL("https://github.com/navyracooon/panda_app");
   };
 
-  const renderLanguageItem = ({ item }) => (
+  const renderLanguageItem = ({ item }: { item: LanguageOption }) => (
     <TouchableOpacity
       style={styles.modalItem}
       onPress={() => handleLanguageChange(item.code)}
@@ -137,7 +142,7 @@ export default function SettingsScreen() {
     </TouchableOpacity>
   );
 
-  const renderNotificationItem = ({ item }) => (
+  const renderNotificationItem = ({ item }: { item: NotificationOption }) => (
     <TouchableOpacity
       style={styles.modalItem}
       onPress={() => handleNotificationToggle(item.id)}
@@ -164,6 +169,7 @@ export default function SettingsScreen() {
       }
     >
       <View style={styles.settingsContainer}>
+        {/* Settings and UI elements */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t("settings.preferences")}</Text>
           <TouchableOpacity
@@ -234,26 +240,6 @@ export default function SettingsScreen() {
           </TouchableOpacity>
           <Text style={styles.supportDescription}>
             {t("settings.contributionDescription")}
-          </Text>
-          <TouchableOpacity
-            style={styles.supportButton}
-            onPress={handleBuyMeACoffee}
-            onPressIn={() =>
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
-            }
-          >
-            <Ionicons
-              name="cafe-outline"
-              size={22}
-              color="#6F4E37"
-              style={styles.icon}
-            />
-            <Text style={styles.supportButtonText}>
-              {t("settings.buyMeACoffee")}
-            </Text>
-          </TouchableOpacity>
-          <Text style={styles.supportDescription}>
-            {t("settings.donationDescription")}
           </Text>
         </View>
 
@@ -422,21 +408,6 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: "#FFFFFF",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  buyMeACoffeeButton: {
-    backgroundColor: "transparent",
-    borderWidth: 2,
-    borderColor: "#6F4E37",
-    padding: 14,
-    borderRadius: 8,
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  buyMeACoffeeButtonText: {
-    color: "#6F4E37",
     fontSize: 16,
     fontWeight: "600",
   },
