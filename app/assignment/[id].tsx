@@ -61,8 +61,8 @@ export default function AssignmentDetailScreen() {
         if (defaultCalendar) {
           const eventDetails = {
             title: assignment.title,
-            startDate: assignment.dueTime,
-            endDate: new Date(assignment.dueTime.getTime() + 60 * 60 * 1000),
+            startDate: new Date(assignment.dueTime),
+            endDate: new Date(assignment.dueTime + 60 * 60 * 1000),
             notes: assignment.instructions,
             timeZone: "GMT",
           };
@@ -103,11 +103,13 @@ export default function AssignmentDetailScreen() {
           <View
             style={[
               styles.dueDateIndicator,
-              { backgroundColor: getDueDateColor(assignment.dueTime) },
+              {
+                backgroundColor: getDueDateColor(new Date(assignment.dueTime)),
+              },
             ]}
           />
           <Text style={styles.dueDate}>
-            {format(assignment.dueTime, "MMM d 'at' H:mm")}
+            {format(new Date(assignment.dueTime), "MMM d 'at' H:mm")}
           </Text>
           <Ionicons
             name="add-circle-outline"
