@@ -21,6 +21,7 @@ export default {
     noAssignments: "No assignments found",
     fetchingAssignments:
       "Fetching assignments... \n (This might take about a minute)",
+    lastRefresh: "Last refreshed: {{time}}",
   },
   assignment: {
     title: "Assignment Details",

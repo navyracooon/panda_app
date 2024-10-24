@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useRouter, useRootNavigationState } from "expo-router";
-import { View, StyleSheet } from "react-native";
-import Spinner from "../components/Spinner";
+import { View, StyleSheet, ActivityIndicator, Text } from "react-native";
 import { useUser } from "../contexts/UserContext";
 import { useLocalization } from "../contexts/LocalizationContext";
 
@@ -39,7 +38,8 @@ export default function Index() {
   if (isChecking || !navigationState?.key) {
     return (
       <View style={styles.container}>
-        <Spinner size={40} color="#000" message={t("common.loading")} />
+        <ActivityIndicator size="large" color="#000" />
+        <Text style={styles.loadingText}>{t("common.loading")}</Text>
       </View>
     );
   }
@@ -53,5 +53,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#FFFFFF",
+  },
+  loadingText: {
+    fontSize: 16,
+    color: "#666",
+    marginTop: 16,
+    textAlign: "center",
   },
 });

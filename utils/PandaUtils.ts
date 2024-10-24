@@ -94,12 +94,9 @@ export default class PandaUtils {
       "https://panda.ecs.kyoto-u.ac.jp/direct/assignment/my.json";
     const response = await user.session.get(assignmentUrl);
 
-    const assignmentList = response.data["assignment_collection"]
-      .map((assignment: any) => PandaParser.parseAssignment(assignment))
-      // PandAのレスポンスに期限切れの課題が含まれることがある
-      .filter((assignment: Assignment) => {
-        return assignment.dueTime > new Date();
-      });
+    const assignmentList = response.data["assignment_collection"].map(
+      (assignment: any) => PandaParser.parseAssignment(assignment),
+    );
 
     await Promise.all(
       assignmentList.map(async (assignment: Assignment) => {
