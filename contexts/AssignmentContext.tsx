@@ -72,7 +72,7 @@ export const AssignmentProvider: React.FC<{ children: ReactNode }> = ({
           return dateA.getTime() - dateB.getTime();
         })
         .filter((assignment: Assignment) => {
-          return assignment.dueTime > new Date();
+          return assignment.dueTime > new Date().getTime();
         });
 
       setAssignments(formattedAssignmentList);

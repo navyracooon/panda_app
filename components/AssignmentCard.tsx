@@ -52,7 +52,9 @@ export default function AssignmentCard(props: Props) {
           <View
             style={[
               styles.dueDateIndicator,
-              { backgroundColor: getDueDateColor(assignment.dueTime) },
+              {
+                backgroundColor: getDueDateColor(new Date(assignment.dueTime)),
+              },
             ]}
           />
           <Text style={styles.title} numberOfLines={1}>
@@ -62,7 +64,7 @@ export default function AssignmentCard(props: Props) {
         <View style={styles.dueDateContainer}>
           <Ionicons name="time-outline" size={16} color="#007AFF" />
           <Text style={styles.dueDate}>
-            {format(assignment.dueTime, "MMM d 'at' H:mm")}
+            {format(new Date(assignment.dueTime), "MMM d 'at' H:mm")}
           </Text>
         </View>
       </View>
