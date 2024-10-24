@@ -20,6 +20,7 @@ export default {
     title: "ホーム",
     noAssignments: "課題が見つかりません",
     fetchingAssignments: "課題を取得中... \n (1分程度かかることがあります)",
+    lastRefresh: "最終更新: {{time}}",
   },
   assignment: {
     title: "課題詳細",

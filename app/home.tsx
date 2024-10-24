@@ -1,21 +1,27 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { FlatList, StyleSheet, Text, View, RefreshControl } from "react-native";
+import {
+  FlatList,
+  StyleSheet,
+  Text,
+  View,
+  RefreshControl,
+  ActivityIndicator,
+} from "react-native";
 import AssignmentCard from "../components/AssignmentCard";
-import PandaUtils from "../utils/PandaUtils";
 import { useAssignments } from "../contexts/AssignmentContext";
-import Spinner from "../components/Spinner";
 import { useLocalization } from "../contexts/LocalizationContext";
 import { useUser } from "../contexts/UserContext";
 import * as SecureStore from "expo-secure-store";
 import { setupNotifications } from "../utils/notificationUtils";
+import { format } from "date-fns";
 
 export default function HomeScreen() {
-  const { assignments, setAssignments } = useAssignments();
+  const { assignments, loadAssignments, lastRefresh } = useAssignments();
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { t } = useLocalization();
-  const { user, loadUser } = useUser();
+  const { user } = useUser();
 
   const fetchAssignments = useCallback(
     async (refresh = false) => {
@@ -27,29 +33,8 @@ export default function HomeScreen() {
         }
         setError(null);
 
-        if (!user) {
-          await loadUser();
-        }
-
         if (user) {
-          const assignmentList = await PandaUtils.getAllAssignments(user);
-          const sortedAssignments = assignmentList.sort((a, b) => {
-            const dateA = new Date(a.dueTime);
-            const dateB = new Date(b.dueTime);
-            return dateA.getTime() - dateB.getTime();
-          });
-
-          setAssignments(sortedAssignments);
-
-          const selectedNotificationsString = await SecureStore.getItemAsync(
-            "selectedNotifications",
-          );
-          if (selectedNotificationsString) {
-            const selectedNotifications = JSON.parse(
-              selectedNotificationsString,
-            );
-            await setupNotifications(sortedAssignments, selectedNotifications);
-          }
+          await loadAssignments(user, refresh);
         } else {
           throw new Error("User not found");
         }
@@ -61,26 +46,45 @@ export default function HomeScreen() {
         setIsRefreshing(false);
       }
     },
-    [setAssignments, t, user, loadUser],
+    [loadAssignments, t, user],
   );
-
-  useEffect(() => {
-    fetchAssignments();
-  }, [fetchAssignments]);
 
   const handleRefresh = useCallback(() => {
     fetchAssignments(true);
   }, [fetchAssignments]);
 
+  useEffect(() => {
+    fetchAssignments();
+  }, [fetchAssignments]);
+
+  useEffect(() => {
+    const setupNotificationsForAssignments = async () => {
+      try {
+        const selectedNotificationsString = await SecureStore.getItemAsync(
+          "selectedNotifications",
+        );
+        if (selectedNotificationsString) {
+          const selectedNotifications = JSON.parse(selectedNotificationsString);
+          await setupNotifications(assignments, selectedNotifications);
+        }
+      } catch (error) {
+        console.error("Error setting up notifications:", error);
+      }
+    };
+
+    if (assignments.length > 0) {
+      setupNotificationsForAssignments();
+    }
+  }, [assignments]);
+
   return (
     <View style={styles.container}>
       {isLoading ? (
         <View style={styles.centerContainer}>
-          <Spinner
-            size={40}
-            color="#000"
-            message={t("home.fetchingAssignments")}
-          />
+          <ActivityIndicator size="large" color="#000" />
+          <Text style={styles.loadingText}>
+            {t("home.fetchingAssignments")}
+          </Text>
         </View>
       ) : (
         <FlatList
@@ -88,6 +92,15 @@ export default function HomeScreen() {
           renderItem={({ item }) => <AssignmentCard assignment={item} />}
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.listContent}
+          ListHeaderComponent={
+            lastRefresh && (
+              <Text style={styles.lastRefreshText}>
+                {t("home.lastRefresh", {
+                  time: format(lastRefresh, "yyyy-MM-dd HH:mm:ss"),
+                })}
+              </Text>
+            )
+          }
           ListEmptyComponent={
             <Text style={styles.emptyText}>
               {error
@@ -130,5 +143,17 @@ const styles = StyleSheet.create({
     color: "#666",
     textAlign: "center",
     marginTop: 20,
+  },
+  lastRefreshText: {
+    fontSize: 12,
+    color: "#666",
+    textAlign: "center",
+    paddingVertical: 2,
+  },
+  loadingText: {
+    fontSize: 16,
+    color: "#666",
+    marginTop: 16,
+    textAlign: "center",
   },
 });
