@@ -126,7 +126,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    paddingTop: 20,
   },
   centerContainer: {
     flex: 1,
@@ -136,7 +135,7 @@ const styles = StyleSheet.create({
   },
   listContent: {
     paddingHorizontal: 16,
-    paddingBottom: 20,
+    paddingVertical: 20,
   },
   emptyText: {
     fontSize: 16,
