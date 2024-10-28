@@ -1,4 +1,6 @@
+import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
+import Constants from "expo-constants";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Alert } from "react-native";
 import Assignment from "../models/Assignment";
@@ -8,26 +10,41 @@ const DEVICE_TOKEN_KEY = "deviceToken";
 export const grantNotificationPermission = async (
   isNecessary: boolean = false,
 ): Promise<boolean> => {
-  const { status } = await Notifications.getPermissionsAsync();
+  if (Device.isDevice) {
+    const { status: existingStatus } =
+      await Notifications.getPermissionsAsync();
 
-  if (status === "granted") {
-    return true;
+    if (existingStatus === "granted") {
+      return true;
+    }
+
+    const { status: finalStatus } =
+      await Notifications.requestPermissionsAsync();
+
+    if (finalStatus === "granted") {
+      const projectId =
+        Constants?.expoConfig?.extra?.eas?.projectId ??
+        Constants?.easConfig?.projectId;
+      if (!projectId) {
+        throw new Error("Failed to retrieve projectId");
+      }
+      const token = (
+        await Notifications.getExpoPushTokenAsync({
+          projectId,
+        })
+      ).data;
+      await AsyncStorage.setItem(DEVICE_TOKEN_KEY, token);
+      return true;
+    } else if (isNecessary) {
+      Alert.alert(
+        "Notification Permission",
+        "You need to enable notifications to use this feature. Please update your device settings.",
+        [{ text: "OK" }],
+      );
+    }
+    return false;
   }
-
-  const { status: finalStatus } = await Notifications.requestPermissionsAsync();
-
-  if (finalStatus === "granted") {
-    const token = (await Notifications.getExpoPushTokenAsync()).data;
-    await AsyncStorage.setItem(DEVICE_TOKEN_KEY, token);
-    return true;
-  } else if (isNecessary) {
-    Alert.alert(
-      "Notification Permission",
-      "You need to enable notifications to use this feature. Please update your device settings.",
-      [{ text: "OK" }],
-    );
-  }
-  return false;
+  return true;
 };
 
 export const getDeviceToken = async (): Promise<string | null> => {
