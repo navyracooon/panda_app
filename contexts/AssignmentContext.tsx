@@ -7,6 +7,7 @@ import React, {
 } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Assignment from "../models/Assignment";
+import Site from "../models/Site";
 import User from "../models/User";
 import PandaUtils from "../utils/PandaUtils";
 
@@ -35,17 +36,68 @@ export const AssignmentProvider: React.FC<{ children: ReactNode }> = ({
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
 
+  const getCurrentSemester = (): string => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const semester =
+      new Date(year, 3, 1) <= now && now < new Date(year, 9, 1)
+        ? "前期"
+        : "後期";
+    const current = `${year}${semester}`;
+
+    return current;
+  };
+
+  const fetchAndSaveSites = useCallback(async (user: User): Promise<Site[]> => {
+    const current = getCurrentSemester();
+    const siteList = await PandaUtils.getAllSites(user, current);
+
+    await AsyncStorage.setItem("sites", JSON.stringify({ siteList, current }));
+
+    return siteList;
+  }, []);
+
+  const loadSites = useCallback(
+    async (user: User, refresh: boolean = false): Promise<Site[]> => {
+      const storedSitesData = await AsyncStorage.getItem("sites");
+
+      let siteList: Site[] = [];
+
+      if (storedSitesData && !refresh) {
+        const parsedData = JSON.parse(storedSitesData);
+        siteList = parsedData.siteList;
+        const current = parsedData.current;
+        if (current !== getCurrentSemester()) {
+          loadSites(user, true);
+        }
+      } else {
+        siteList = await fetchAndSaveSites(user);
+      }
+
+      return siteList;
+    },
+    [],
+  );
+
   const fetchAndSaveAssignments = useCallback(
     async (user: User): Promise<Assignment[]> => {
-      const assignmentList = await PandaUtils.getAllAssignments(user);
-      const timestamp = new Date().toISOString();
+      const siteList = await loadSites(user);
 
+      const assignments: Assignment[] = await Promise.all(
+        siteList.map(async (site) => {
+          return await PandaUtils.getAssignmentsBySite(user, site);
+        }),
+      ).then((results) => results.flat());
+
+      console.log(assignments);
+
+      const timestamp = new Date().toISOString();
       await AsyncStorage.setItem(
         "assignments",
-        JSON.stringify({ assignmentList, timestamp }),
+        JSON.stringify({ assignments, timestamp }),
       );
 
-      return assignmentList;
+      return assignments;
     },
     [],
   );
@@ -55,9 +107,9 @@ export const AssignmentProvider: React.FC<{ children: ReactNode }> = ({
       let assignmentList: Assignment[] = [];
       let timestamp: string = "";
 
-      const storedData = await AsyncStorage.getItem("assignments");
-      if (storedData && !refresh) {
-        const parsedData = JSON.parse(storedData);
+      const storedAssignmentsData = await AsyncStorage.getItem("assignments");
+      if (storedAssignmentsData && !refresh) {
+        const parsedData = JSON.parse(storedAssignmentsData);
         assignmentList = parsedData.assignmentList;
         timestamp = parsedData.timestamp;
       } else {
