@@ -88,11 +88,12 @@ export default class PandaUtils {
     }
   }
 
+  // 遅いので非推奨
   static async getAllAssignments(user: User): Promise<Assignment[]> {
     await this.loginPanda(user);
-    const assignmentUrl =
+    const assignmentListUrl =
       "https://panda.ecs.kyoto-u.ac.jp/direct/assignment/my.json";
-    const response = await user.session.get(assignmentUrl);
+    const response = await user.session.get(assignmentListUrl);
 
     const assignmentList = response.data["assignment_collection"].map(
       (assignment: any) => PandaParser.parseAssignment(assignment),
@@ -113,5 +114,41 @@ export default class PandaUtils {
 
     const site = PandaParser.parseSite(response.data);
     return site;
+  }
+
+  static async getAllSites(user: User, key?: string): Promise<Site[]> {
+    await this.loginPanda(user);
+    const siteListUrl =
+      "https://panda.ecs.kyoto-u.ac.jp/direct/site.json?_limit=1000";
+    const response = await user.session.get(siteListUrl);
+
+    const siteList = response.data["site_collection"].map((site: any) =>
+      PandaParser.parseSite(site),
+    );
+
+    if (key) {
+      return siteList.filter((site: Site) => site.title.includes(key));
+    }
+
+    return siteList;
+  }
+
+  static async getAssignmentsBySite(
+    user: User,
+    site: Site,
+  ): Promise<Assignment[]> {
+    await this.loginPanda(user);
+    const assignmentUrl = `https://panda.ecs.kyoto-u.ac.jp/direct/assignment/site/${site.id}.json`;
+    const response = await user.session.get(assignmentUrl);
+
+    const assignmentList = response.data["assignment_collection"].map(
+      (assignment: any) => {
+        const parsedAssignment = PandaParser.parseAssignment(assignment);
+        parsedAssignment.site = site;
+        return parsedAssignment;
+      },
+    );
+
+    return assignmentList;
   }
 }
