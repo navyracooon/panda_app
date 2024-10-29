@@ -76,7 +76,7 @@ export const AssignmentProvider: React.FC<{ children: ReactNode }> = ({
 
       return siteList;
     },
-    [],
+    [fetchAndSaveSites],
   );
 
   const fetchAndSaveAssignments = useCallback(
@@ -99,7 +99,7 @@ export const AssignmentProvider: React.FC<{ children: ReactNode }> = ({
 
       return assignments;
     },
-    [],
+    [loadSites],
   );
 
   const loadAssignments = useCallback(
