@@ -83,21 +83,19 @@ export const AssignmentProvider: React.FC<{ children: ReactNode }> = ({
     async (user: User): Promise<Assignment[]> => {
       const siteList = await loadSites(user);
 
-      const assignments: Assignment[] = await Promise.all(
+      const assignmentList: Assignment[] = await Promise.all(
         siteList.map(async (site) => {
           return await PandaUtils.getAssignmentsBySite(user, site);
         }),
       ).then((results) => results.flat());
 
-      console.log(assignments);
-
       const timestamp = new Date().toISOString();
       await AsyncStorage.setItem(
         "assignments",
-        JSON.stringify({ assignments, timestamp }),
+        JSON.stringify({ assignmentList, timestamp }),
       );
 
-      return assignments;
+      return assignmentList;
     },
     [loadSites],
   );
