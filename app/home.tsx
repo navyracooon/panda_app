@@ -54,7 +54,12 @@ export default function HomeScreen() {
   }, [fetchAssignments]);
 
   useEffect(() => {
-    fetchAssignments();
+    const initializeAssignments = async () => {
+      await fetchAssignments();
+      await fetchAssignments(true);
+    };
+
+    initializeAssignments();
   }, [fetchAssignments]);
 
   useEffect(() => {

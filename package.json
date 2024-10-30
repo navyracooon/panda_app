@@ -11,6 +11,7 @@
     "test": "jest --watchAll --env-file=.env",
     "lint": "expo lint",
     "format": "npx eslint . --fix --quiet; prettier . --write",
+    "precommit": "npx eslint . --fix --quiet; prettier . --write; expo lint",
     "prepare": "husky"
   },
   "jest": {
