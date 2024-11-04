@@ -36,6 +36,15 @@ Apache License 2.0
 
 このアプリは京都大学の公式アプリではなく、学生が作成した非公式のアプリです。
 
+## プライバシーポリシー (Privacy Policy)
+
+- [iOS](https://github.com/navyracooon/panda_app/blob/main/docs/privacy_policy_ios.md)
+- [Android](https://github.com/navyracooon/panda_app/blob/main/docs/privacy_policy_android.md)
+
+## 開発者情報 (Developers)
+
+- 代表：門田雅樹（京都大学工学部電気電子工学科）
+
 ## クレジット (Credits)
 
 このアプリは主に以下のオープンソースライブラリを利用しています  
