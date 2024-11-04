@@ -24,10 +24,12 @@ export default function HomeScreen() {
   const { user } = useUser();
 
   const fetchAssignments = useCallback(
-    async (refresh = false) => {
+    async (refresh = false, silentRefresh = false) => {
       try {
         if (refresh) {
-          setIsRefreshing(true);
+          if (!silentRefresh) {
+            setIsRefreshing(true);
+          }
         } else {
           setIsLoading(true);
         }
@@ -56,7 +58,7 @@ export default function HomeScreen() {
   useEffect(() => {
     const initializeAssignments = async () => {
       await fetchAssignments();
-      await fetchAssignments(true);
+      await fetchAssignments(true, true);
     };
 
     initializeAssignments();
