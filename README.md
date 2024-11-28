@@ -32,10 +32,6 @@ Apache License 2.0
 - Email: navyracooon@gmail.com
 - X (Twitter): [@navyracooon](https://twitter.com/navyracooon)
 
-## 免責事項 (Disclaimer)
-
-このアプリは京都大学の公式アプリではなく、学生が作成した非公式のアプリです。
-
 ## プライバシーポリシー (Privacy Policy)
 
 - [iOS](https://github.com/navyracooon/panda_app/blob/main/docs/privacy_policy_ios.md)
@@ -44,6 +40,12 @@ Apache License 2.0
 ## 開発者情報 (Developers)
 
 - 代表：門田雅樹（京都大学工学部電気電子工学科）
+
+## Code for PandA
+
+課題閲覧をモバイルアプリで快適に行うとともに、通知機能により課題の出し忘れを防ぐために作成されました。  
+本プロジェクトは、京都大学情報環境機構の Code for PandA 事例認定を受けています (認定日: 2024年 11月 27日)。  
+詳しくは[こちら](https://www.iimc.kyoto-u.ac.jp/ja/services/education/lms/#07)をご覧下さい。
 
 ## クレジット (Credits)
 
