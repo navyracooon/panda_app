@@ -29,7 +29,6 @@ export default class Site {
     public reference: string,
     public shortDescription: string,
     public siteGroups: any[],
-    public siteGroupsList: any[],
     public siteOwner: any,
     public sitePages: any[],
     public skin: string,

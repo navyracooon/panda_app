@@ -38,11 +38,12 @@ export const AssignmentProvider: React.FC<{ children: ReactNode }> = ({
 
   const getCurrentSemester = (): string => {
     const now = new Date();
-    const year = now.getFullYear();
+
+    // 年を年度に直す
+    const year =
+      now.getMonth() <= 2 ? now.getFullYear() - 1 : now.getFullYear();
     const semester =
-      new Date(year, 3, 1) <= now && now < new Date(year, 9, 1)
-        ? "前期"
-        : "後期";
+      3 <= now.getMonth() && now.getMonth() <= 7 ? "前期" : "後期";
     const current = `${year}${semester}`;
 
     return current;
