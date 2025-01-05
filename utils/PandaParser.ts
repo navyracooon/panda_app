@@ -84,7 +84,6 @@ export default class PandaParser {
       data.reference,
       data.shortDescription,
       data.siteGroups,
-      data.siteGroupsList,
       data.siteOwner,
       data.sitePages,
       data.skin,
