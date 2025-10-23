@@ -17,6 +17,7 @@ import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { grantNotificationPermission } from "../utils/notificationUtils";
 import { useUser } from "../contexts/UserContext";
+import { PandaAuthError } from "../utils/PandaUtils";
 
 const { width } = Dimensions.get("window");
 
@@ -41,14 +42,18 @@ export default function LoginScreen() {
     setIsLoading(true);
 
     try {
-      const loginStatus = await login(ecsId, password);
-      if (loginStatus) {
-        router.replace("/home");
+      await login(ecsId, password);
+      router.replace("/home");
+    } catch (error) {
+      if (error instanceof PandaAuthError) {
+        Alert.alert("Error", error.message);
       } else {
-        Alert.alert("Error", "Invalid ECS-ID or password");
+        console.error("An error occurred during login:", error);
+        Alert.alert(
+          "Error",
+          "An unexpected error occurred during login. Please try again.",
+        );
       }
-    } catch {
-      Alert.alert("Error", "An error occurred during login. Please try again.");
     } finally {
       setIsLoading(false);
     }
