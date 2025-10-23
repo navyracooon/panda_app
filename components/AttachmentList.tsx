@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import Attachment from "../models/Attachment";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalization } from "../contexts/LocalizationContext";
-import * as FileSystem from "expo-file-system";
+import { File, Directory, Paths } from "expo-file-system";
 import * as Sharing from "expo-sharing";
 
 interface AttachmentListProps {
@@ -42,25 +42,41 @@ export default function AttachmentList({
   };
 
   const handleDownload = async (attachment: Attachment) => {
-    const callback = (downloadProgress: FileSystem.DownloadProgressData) => {
-      const progress =
-        downloadProgress.totalBytesWritten /
-        downloadProgress.totalBytesExpectedToWrite;
-      setDownloadProgress((prev) => ({ ...prev, [attachment.name]: progress }));
-    };
+    let targetDirectory: Directory | null = null;
+    try {
+      targetDirectory = Paths.document;
+    } catch (error) {
+      console.warn(
+        "Failed to access document directory, fallback to cache.",
+        error,
+      );
+    }
 
-    const downloadResumable = FileSystem.createDownloadResumable(
-      attachment.url,
-      FileSystem.documentDirectory + attachment.name,
-      {},
-      callback,
-    );
+    if (!targetDirectory) {
+      try {
+        targetDirectory = Paths.cache;
+      } catch (error) {
+        console.warn("Failed to access cache directory.", error);
+      }
+    }
+
+    if (!targetDirectory) {
+      Alert.alert(
+        t("attachment.downloadError"),
+        t("attachment.downloadErrorMessage"),
+      );
+      return;
+    }
+
+    const destinationFile = new File(targetDirectory, attachment.name);
 
     try {
-      const downloadResult = await downloadResumable.downloadAsync();
-      if (downloadResult !== undefined) {
-        await Sharing.shareAsync(downloadResult.uri);
-      }
+      const downloadedFile = await File.downloadFileAsync(
+        attachment.url,
+        destinationFile,
+        { idempotent: true },
+      );
+      await Sharing.shareAsync(downloadedFile.uri);
     } catch (e) {
       console.error("Download error:", e);
       Alert.alert(
