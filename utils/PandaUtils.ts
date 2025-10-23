@@ -5,15 +5,41 @@ import Assignment from "../models/Assignment";
 import Site from "../models/Site";
 import User from "../models/User";
 
+export class PandaAuthError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "PandaAuthError";
+  }
+}
+
 export default class PandaUtils {
+  private static handleAxiosError(error: unknown, message: string): never {
+    if (axios.isAxiosError(error) && error.response?.status === 403) {
+      throw new PandaAuthError(message);
+    }
+    if (error instanceof Error) {
+      throw error;
+    }
+    throw new Error(String(error));
+  }
+
   static async loginPanda(
     user: User,
     retryOnError: boolean = true,
+    forceReauthenticate: boolean = false,
   ): Promise<void> {
     try {
-      const currentStatus = await this.userStatus(user);
-      if (currentStatus) {
-        return;
+      if (forceReauthenticate) {
+        try {
+          await this.logoutPanda(user);
+        } catch (logoutError) {
+          console.warn("Logout before forced login failed:", logoutError);
+        }
+      } else {
+        const currentStatus = await this.userStatus(user);
+        if (currentStatus) {
+          return;
+        }
       }
 
       const loginUrl =
@@ -55,24 +81,52 @@ export default class PandaUtils {
 
       const errorMessage = '<div id="msg" class="errors">';
       if (loginResponse.data.includes(errorMessage)) {
-        throw new Error(
-          `Failed to login with provided credentials. \n
-            username: ${user.username}, \n
-            error: ${URLParser.getDivContentByClass(loginResponse.data, "errors")}`,
+        const serverMessage =
+          URLParser.getDivContentByClass(loginResponse.data, "errors") ??
+          "Unknown error";
+        throw new PandaAuthError(
+          `Failed to login with provided credentials.\nusername: ${user.username}\nerror: ${serverMessage}`,
         );
       }
-    } catch (e) {
-      console.error(`Login failed: ${e}`);
-      if (retryOnError) {
-        await this.logoutPanda(user);
-        await this.loginPanda(user, false);
+
+      const authenticated = await this.userStatus(user);
+      if (!authenticated) {
+        throw new PandaAuthError("Authentication failed after login attempt.");
       }
+    } catch (e) {
+      const error = e instanceof Error ? e : new Error(String(e));
+      if (retryOnError && !(error instanceof PandaAuthError)) {
+        try {
+          await this.logoutPanda(user);
+        } catch (logoutError) {
+          console.warn("Logout before retry failed:", logoutError);
+        }
+        await this.loginPanda(user, false, forceReauthenticate);
+        return;
+      }
+      console.error("Login failed:", error);
+      throw error;
     }
   }
 
   static async logoutPanda(user: User): Promise<void> {
     const logoutUrl = "https://panda.ecs.kyoto-u.ac.jp/portal/logout";
-    await user.session.get(logoutUrl);
+    const casLogoutUrl = "https://panda.ecs.kyoto-u.ac.jp/cas/logout";
+    try {
+      await user.session.get(logoutUrl);
+      await user.session.get(casLogoutUrl);
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response?.status === 403) {
+        return;
+      }
+      throw error;
+    } finally {
+      try {
+        await user.clearCookies();
+      } catch (cookieError) {
+        console.warn("Failed to clear cookies on logout:", cookieError);
+      }
+    }
   }
 
   static async userStatus(user: User): Promise<boolean> {
@@ -93,7 +147,18 @@ export default class PandaUtils {
     await this.loginPanda(user);
     const assignmentListUrl =
       "https://panda.ecs.kyoto-u.ac.jp/direct/assignment/my.json";
-    const response = await user.session.get(assignmentListUrl);
+    let response;
+    try {
+      response = await user.session.get(assignmentListUrl);
+    } catch (error) {
+      this.handleAxiosError(
+        error,
+        "Session expired while fetching assignments.",
+      );
+    }
+    if (!response) {
+      throw new Error("Failed to fetch assignments: empty response.");
+    }
 
     const assignmentList = response.data["assignment_collection"].map(
       (assignment: any) => PandaParser.parseAssignment(assignment),
@@ -110,7 +175,18 @@ export default class PandaUtils {
   static async getSite(user: User, siteId: string): Promise<Site> {
     await this.loginPanda(user);
     const siteUrl = `https://panda.ecs.kyoto-u.ac.jp/direct/site/${siteId}.json`;
-    const response = await user.session.get(siteUrl);
+    let response;
+    try {
+      response = await user.session.get(siteUrl);
+    } catch (error) {
+      this.handleAxiosError(
+        error,
+        `Session expired while fetching site ${siteId}.`,
+      );
+    }
+    if (!response) {
+      throw new Error(`Failed to fetch site ${siteId}: empty response.`);
+    }
 
     const site = PandaParser.parseSite(response.data);
     return site;
@@ -120,7 +196,15 @@ export default class PandaUtils {
     await this.loginPanda(user);
     const siteListUrl =
       "https://panda.ecs.kyoto-u.ac.jp/direct/site.json?_limit=1000";
-    const response = await user.session.get(siteListUrl);
+    let response;
+    try {
+      response = await user.session.get(siteListUrl);
+    } catch (error) {
+      this.handleAxiosError(error, "Session expired while fetching sites.");
+    }
+    if (!response) {
+      throw new Error("Failed to fetch sites: empty response.");
+    }
 
     const siteList = response.data["site_collection"].map((site: any) =>
       PandaParser.parseSite(site),
@@ -139,7 +223,20 @@ export default class PandaUtils {
   ): Promise<Assignment[]> {
     await this.loginPanda(user);
     const assignmentUrl = `https://panda.ecs.kyoto-u.ac.jp/direct/assignment/site/${site.id}.json`;
-    const response = await user.session.get(assignmentUrl);
+    let response;
+    try {
+      response = await user.session.get(assignmentUrl);
+    } catch (error) {
+      this.handleAxiosError(
+        error,
+        `Session expired while fetching assignments for ${site.id}.`,
+      );
+    }
+    if (!response) {
+      throw new Error(
+        `Failed to fetch assignments for ${site.id}: empty response.`,
+      );
+    }
 
     const assignmentList = response.data["assignment_collection"].map(
       (assignment: any) => {

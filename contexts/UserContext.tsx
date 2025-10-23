@@ -1,12 +1,12 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
 import * as SecureStore from "expo-secure-store";
 import User from "../models/User";
-import PandaUtils from "../utils/PandaUtils";
+import PandaUtils, { PandaAuthError } from "../utils/PandaUtils";
 
 interface UserContextType {
   user: User | null;
   setUser: (user: User | null) => void;
-  login: (ecsId: string, password: string) => Promise<boolean>;
+  login: (ecsId: string, password: string) => Promise<void>;
   loadUser: () => Promise<boolean>;
   logout: () => Promise<void>;
 }
@@ -22,19 +22,15 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
     const user = new User(ecsId, password);
 
     try {
-      const isValid = await user.checkLogin();
-      if (isValid) {
-        await SecureStore.setItemAsync(
-          "userCredentials",
-          JSON.stringify({ ecsId, password }),
-        );
-        setUser(user);
-        return true;
-      }
-      return false;
+      await user.checkLogin(true);
+      await SecureStore.setItemAsync(
+        "userCredentials",
+        JSON.stringify({ ecsId, password }),
+      );
+      setUser(user);
     } catch (error) {
-      console.error("Error while logging in:", error);
-      return false;
+      await SecureStore.deleteItemAsync("userCredentials");
+      throw error;
     }
   };
 
@@ -44,25 +40,41 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
         await SecureStore.getItemAsync("userCredentials");
       if (userCredentialsString) {
         const userCredentials = JSON.parse(userCredentialsString);
-        setUser(new User(userCredentials.ecsId, userCredentials.password));
+        const storedUser = new User(
+          userCredentials.ecsId,
+          userCredentials.password,
+        );
+        await storedUser.checkLogin();
+        setUser(storedUser);
         return true;
       }
       return false;
     } catch (error) {
-      console.error("Error loading user credentials:", error);
+      if (error instanceof PandaAuthError) {
+        console.warn("Stored credentials are no longer valid.");
+      } else {
+        console.error("Error loading user credentials:", error);
+      }
+      await SecureStore.deleteItemAsync("userCredentials");
+      setUser(null);
       return false;
     }
   };
 
   const logout = async () => {
+    if (!user) {
+      await SecureStore.deleteItemAsync("userCredentials");
+      setUser(null);
+      return;
+    }
+
     try {
-      if (user) {
-        PandaUtils.logoutPanda(user);
-        await SecureStore.deleteItemAsync("userCredentials");
-        setUser(null);
-      }
+      await PandaUtils.logoutPanda(user);
     } catch (error) {
       console.error("Error during logout:", error);
+    } finally {
+      await SecureStore.deleteItemAsync("userCredentials");
+      setUser(null);
     }
   };
 

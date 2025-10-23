@@ -7,6 +7,7 @@ import {
   RefreshControl,
   ActivityIndicator,
 } from "react-native";
+import { useRouter } from "expo-router";
 import AssignmentCard from "../components/AssignmentCard";
 import { useAssignments } from "../contexts/AssignmentContext";
 import { useLocalization } from "../contexts/LocalizationContext";
@@ -14,6 +15,7 @@ import { useUser } from "../contexts/UserContext";
 import * as SecureStore from "expo-secure-store";
 import { setupNotifications } from "../utils/notificationUtils";
 import { format } from "date-fns";
+import { PandaAuthError } from "../utils/PandaUtils";
 
 export default function HomeScreen() {
   const { assignments, loadAssignments, lastRefresh } = useAssignments();
@@ -21,7 +23,8 @@ export default function HomeScreen() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { t } = useLocalization();
-  const { user } = useUser();
+  const { user, logout } = useUser();
+  const router = useRouter();
 
   const fetchAssignments = useCallback(
     async (refresh = false, silentRefresh = false) => {
@@ -42,13 +45,18 @@ export default function HomeScreen() {
         }
       } catch (err) {
         console.error("Error fetching assignments:", err);
+        if (err instanceof PandaAuthError) {
+          await logout();
+          router.replace("/login");
+          return;
+        }
         setError(err instanceof Error ? err.message : t("common.error"));
       } finally {
         setIsLoading(false);
         setIsRefreshing(false);
       }
     },
-    [loadAssignments, t, user],
+    [loadAssignments, logout, router, t, user],
   );
 
   const handleRefresh = useCallback(() => {
