@@ -3,8 +3,8 @@ import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   useWindowDimensions,
+  Pressable,
 } from "react-native";
 import { format, differenceInDays } from "date-fns";
 import { useRouter } from "expo-router";
@@ -39,10 +39,10 @@ export default function AssignmentCard(props: Props) {
   };
 
   return (
-    <TouchableOpacity
+    <Pressable
       onPress={() => router.push(`/assignment/${assignment.id}`)}
       onPressIn={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)}
-      style={styles.card}
+      style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
     >
       <Text style={styles.siteTitle} numberOfLines={1}>
         {assignment.site?.title}
@@ -84,7 +84,7 @@ export default function AssignmentCard(props: Props) {
           <Ionicons name="chevron-forward" size={16} color="#007AFF" />
         </View>
       </View>
-    </TouchableOpacity>
+    </Pressable>
   );
 }
 
@@ -100,6 +100,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
+  },
+  cardPressed: {
+    opacity: 0.9,
   },
   siteTitle: {
     fontSize: 12,

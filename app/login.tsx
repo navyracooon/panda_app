@@ -3,13 +3,13 @@ import {
   View,
   Text,
   TextInput,
-  TouchableOpacity,
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
   Animated,
   Dimensions,
   Alert,
+  Pressable,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -125,17 +125,21 @@ export default function LoginScreen() {
               { transform: [{ scale: scaleAnim }] },
             ]}
           >
-            <TouchableOpacity
-              style={styles.button}
+            <Pressable
               onPress={handleLogin}
               onPressIn={handlePressIn}
               onPressOut={handlePressOut}
               disabled={isLoading}
+              style={({ pressed }) => [
+                styles.button,
+                pressed && !isLoading && styles.buttonPressed,
+                isLoading && styles.buttonDisabled,
+              ]}
             >
               <Text style={styles.buttonText}>
                 {isLoading ? "Logging in..." : "Login"}
               </Text>
-            </TouchableOpacity>
+            </Pressable>
           </Animated.View>
         </View>
       </KeyboardAvoidingView>
@@ -193,6 +197,12 @@ const styles = StyleSheet.create({
     padding: 18,
     borderRadius: 8,
     alignItems: "center",
+  },
+  buttonPressed: {
+    opacity: 0.85,
+  },
+  buttonDisabled: {
+    opacity: 0.6,
   },
   buttonText: {
     color: "#fff",

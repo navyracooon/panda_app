@@ -1,8 +1,7 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Stack, useRouter } from "expo-router";
-import { TouchableOpacity } from "react-native";
+import { Pressable, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { LogBox } from "react-native";
 
 import { AssignmentProvider } from "../contexts/AssignmentContext";
 import { LocalizationProvider } from "../contexts/LocalizationContext";
@@ -11,21 +10,35 @@ import { UserProvider } from "../contexts/UserContext";
 export default function RootLayout() {
   const router = useRouter();
 
-  useEffect(() => {
-    // react-native-render-html によるエラー回避
-    LogBox.ignoreLogs([
-      "TNodeChildrenRenderer",
-      "MemoizedTNodeRenderer",
-      "TRenderEngineProvider",
-      "bound renderChildren",
-    ]);
-  }, []);
+  const renderSettingsButton = React.useCallback(
+    ({ tintColor }: { tintColor?: string }) => (
+      <Pressable
+        hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+        onPress={() => router.push("/settings")}
+        style={({ pressed }) => [
+          styles.headerIconButton,
+          pressed && styles.headerIconButtonPressed,
+        ]}
+      >
+        <Ionicons
+          name="settings-outline"
+          size={22}
+          color={tintColor ?? "#000"}
+        />
+      </Pressable>
+    ),
+    [router],
+  );
 
   return (
     <LocalizationProvider>
       <UserProvider>
         <AssignmentProvider>
-          <Stack>
+          <Stack
+            screenOptions={{
+              headerTintColor: "#000",
+            }}
+          >
             <Stack.Screen
               name="index"
               options={{
@@ -43,30 +56,22 @@ export default function RootLayout() {
               options={{
                 title: "",
                 headerBackVisible: false,
-                headerRight: () => (
-                  <TouchableOpacity onPress={() => router.push("/settings")}>
-                    <Ionicons name="settings-outline" size={24} color="#000" />
-                  </TouchableOpacity>
-                ),
+                headerRight: renderSettingsButton,
               }}
             />
             <Stack.Screen
               name="assignment/[id]"
               options={{
                 title: "",
-                headerBackTitleVisible: false,
-                headerRight: () => (
-                  <TouchableOpacity onPress={() => router.push("/settings")}>
-                    <Ionicons name="settings-outline" size={24} color="#000" />
-                  </TouchableOpacity>
-                ),
+                headerBackTitle: "",
+                headerRight: renderSettingsButton,
               }}
             />
             <Stack.Screen
               name="settings"
               options={{
                 title: "",
-                headerBackTitleVisible: false,
+                headerBackTitle: "",
               }}
             />
           </Stack>
@@ -75,3 +80,14 @@ export default function RootLayout() {
     </LocalizationProvider>
   );
 }
+
+const styles = StyleSheet.create({
+  headerIconButton: {
+    padding: 6,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  headerIconButtonPressed: {
+    opacity: 0.6,
+  },
+});

@@ -5,13 +5,14 @@
   "scripts": {
     "start": "expo start",
     "reset-project": "node ./scripts/reset-project.js",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
     "web": "expo start --web",
     "test": "jest --watchAll --env-file=.env",
     "lint": "expo lint",
     "format": "npx eslint . --fix --quiet; prettier . --write",
     "precommit": "npx eslint . --fix --quiet; prettier . --write; expo lint",
+    "build": "npx eas build --platform all",
     "prepare": "husky"
   },
   "jest": {
