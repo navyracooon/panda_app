@@ -1,5 +1,9 @@
 import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
+import {
+  SchedulableTriggerInputTypes,
+  type NotificationTriggerInput,
+} from "expo-notifications";
 import Constants from "expo-constants";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Alert } from "react-native";
@@ -86,12 +90,17 @@ export const scheduleNotification = async (
     return;
   }
 
+  const trigger: NotificationTriggerInput = {
+    type: SchedulableTriggerInputTypes.DATE,
+    date: notificationDate,
+  };
+
   await Notifications.scheduleNotificationAsync({
     content: {
       title: `Assignment Due Soon: ${assignment.title}`,
       body: `Your assignment "${assignment.title}" is due ${notificationTiming} from now.`,
     },
-    trigger: notificationDate,
+    trigger,
   });
 
   return;

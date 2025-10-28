@@ -3,14 +3,13 @@ import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   Alert,
   ScrollView,
   Modal,
   FlatList,
   TouchableWithoutFeedback,
   Linking,
-  RefreshControl,
+  Pressable,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
@@ -56,7 +55,6 @@ export default function SettingsScreen() {
   const [selectedNotifications, setSelectedNotifications] = useState<string[]>(
     [],
   );
-  const [refreshing, setRefreshing] = useState(false);
   const { logout } = useUser();
 
   const loadSettings = useCallback(async () => {
@@ -70,12 +68,6 @@ export default function SettingsScreen() {
 
   useEffect(() => {
     loadSettings();
-  }, [loadSettings]);
-
-  const onRefresh = useCallback(async () => {
-    setRefreshing(true);
-    await loadSettings();
-    setRefreshing(false);
   }, [loadSettings]);
 
   const handleLanguageChange = async (selectedLanguage: string) => {
@@ -131,21 +123,27 @@ export default function SettingsScreen() {
   };
 
   const renderLanguageItem = ({ item }: { item: LanguageOption }) => (
-    <TouchableOpacity
-      style={styles.modalItem}
+    <Pressable
       onPress={() => handleLanguageChange(item.code)}
+      style={({ pressed }) => [
+        styles.modalItem,
+        pressed && styles.pressablePressed,
+      ]}
     >
       <Text style={styles.modalItemText}>{item.label}</Text>
       {locale === item.code && (
         <Ionicons name="checkmark" size={22} color="#007AFF" />
       )}
-    </TouchableOpacity>
+    </Pressable>
   );
 
   const renderNotificationItem = ({ item }: { item: NotificationOption }) => (
-    <TouchableOpacity
-      style={styles.modalItem}
+    <Pressable
       onPress={() => handleNotificationToggle(item.id)}
+      style={({ pressed }) => [
+        styles.modalItem,
+        pressed && styles.pressablePressed,
+      ]}
     >
       <Text style={styles.modalItemText}>
         {t(`notificationOptions.${item.label}`)}
@@ -153,28 +151,21 @@ export default function SettingsScreen() {
       {selectedNotifications.includes(item.id) && (
         <Ionicons name="checkmark" size={22} color="#007AFF" />
       )}
-    </TouchableOpacity>
+    </Pressable>
   );
 
   return (
-    <ScrollView
-      style={styles.container}
-      refreshControl={
-        <RefreshControl
-          refreshing={refreshing}
-          onRefresh={onRefresh}
-          colors={["#808080"]}
-          tintColor="#808080"
-        />
-      }
-    >
+    <ScrollView style={styles.container}>
       <View style={styles.settingsContainer}>
         {/* Settings and UI elements */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t("settings.preferences")}</Text>
-          <TouchableOpacity
-            style={styles.settingItem}
+          <Pressable
             onPress={() => setShowLanguageModal(true)}
+            style={({ pressed }) => [
+              styles.settingItem,
+              pressed && styles.pressablePressed,
+            ]}
           >
             <View style={styles.settingLabelContainer}>
               <Ionicons
@@ -191,11 +182,14 @@ export default function SettingsScreen() {
               </Text>
               <Ionicons name="chevron-forward" size={22} color="#000000" />
             </View>
-          </TouchableOpacity>
+          </Pressable>
 
-          <TouchableOpacity
-            style={styles.settingItem}
+          <Pressable
             onPress={handleOpenNotificationSettings}
+            style={({ pressed }) => [
+              styles.settingItem,
+              pressed && styles.pressablePressed,
+            ]}
           >
             <View style={styles.settingLabelContainer}>
               <Ionicons
@@ -216,17 +210,21 @@ export default function SettingsScreen() {
               </Text>
               <Ionicons name="chevron-forward" size={22} color="#000000" />
             </View>
-          </TouchableOpacity>
+          </Pressable>
         </View>
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t("settings.support")}</Text>
-          <TouchableOpacity
-            style={[styles.supportButton, styles.githubButton]}
+          <Pressable
             onPress={handleGitHubContribute}
             onPressIn={() =>
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
             }
+            style={({ pressed }) => [
+              styles.supportButton,
+              styles.githubButton,
+              pressed && styles.pressablePressed,
+            ]}
           >
             <Ionicons
               name="logo-github"
@@ -237,7 +235,7 @@ export default function SettingsScreen() {
             <Text style={[styles.supportButtonText, styles.githubButtonText]}>
               {t("settings.contributeGithub")}
             </Text>
-          </TouchableOpacity>
+          </Pressable>
           <Text style={styles.supportDescription}>
             {t("settings.contributionDescription")}
           </Text>
@@ -245,15 +243,18 @@ export default function SettingsScreen() {
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t("settings.account")}</Text>
-          <TouchableOpacity
-            style={styles.button}
+          <Pressable
             onPress={handleLogout}
             onPressIn={() =>
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy)
             }
+            style={({ pressed }) => [
+              styles.button,
+              pressed && styles.buttonPressed,
+            ]}
           >
             <Text style={styles.buttonText}>{t("settings.logout")}</Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
       </View>
 
@@ -275,14 +276,17 @@ export default function SettingsScreen() {
                   renderItem={renderLanguageItem}
                   keyExtractor={(item) => item.code}
                 />
-                <TouchableOpacity
-                  style={styles.closeButton}
+                <Pressable
                   onPress={() => setShowLanguageModal(false)}
+                  style={({ pressed }) => [
+                    styles.closeButton,
+                    pressed && styles.pressablePressed,
+                  ]}
                 >
                   <Text style={styles.closeButtonText}>
                     {t("common.close")}
                   </Text>
-                </TouchableOpacity>
+                </Pressable>
               </View>
             </TouchableWithoutFeedback>
           </View>
@@ -309,14 +313,17 @@ export default function SettingsScreen() {
                   renderItem={renderNotificationItem}
                   keyExtractor={(item) => item.id}
                 />
-                <TouchableOpacity
-                  style={styles.closeButton}
+                <Pressable
                   onPress={() => setShowNotificationModal(false)}
+                  style={({ pressed }) => [
+                    styles.closeButton,
+                    pressed && styles.pressablePressed,
+                  ]}
                 >
                   <Text style={styles.closeButtonText}>
                     {t("common.close")}
                   </Text>
-                </TouchableOpacity>
+                </Pressable>
               </View>
             </TouchableWithoutFeedback>
           </View>
@@ -377,6 +384,9 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     lineHeight: 20,
   },
+  pressablePressed: {
+    opacity: 0.7,
+  },
   supportButton: {
     backgroundColor: "transparent",
     borderWidth: 2,
@@ -405,6 +415,9 @@ const styles = StyleSheet.create({
     padding: 14,
     borderRadius: 8,
     alignItems: "center",
+  },
+  buttonPressed: {
+    opacity: 0.85,
   },
   buttonText: {
     color: "#FFFFFF",

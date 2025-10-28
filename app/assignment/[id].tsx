@@ -6,7 +6,7 @@ import {
   ScrollView,
   useWindowDimensions,
   Alert,
-  TouchableOpacity,
+  Pressable,
   Linking,
 } from "react-native";
 import { useLocalSearchParams } from "expo-router";
@@ -92,12 +92,15 @@ export default function AssignmentDetailScreen() {
       <View style={styles.contentContainer}>
         <Text style={styles.siteTitle}>{assignment.site?.title}</Text>
         <Text style={styles.title}>{assignment.title}</Text>
-        <TouchableOpacity
-          style={styles.dueDateContainer}
+        <Pressable
           onPress={handleDatePress}
           onPressIn={() =>
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
           }
+          style={({ pressed }) => [
+            styles.dueDateContainer,
+            pressed && styles.pressablePressed,
+          ]}
         >
           <Ionicons name="calendar-outline" size={24} color="#000" />
           <View
@@ -117,7 +120,7 @@ export default function AssignmentDetailScreen() {
             color="#007AFF"
             style={styles.addIcon}
           />
-        </TouchableOpacity>
+        </Pressable>
         <View style={styles.descriptionContainer}>
           <Text style={styles.sectionTitle}>{t("assignment.description")}</Text>
           <RenderHtml
@@ -126,18 +129,21 @@ export default function AssignmentDetailScreen() {
           />
         </View>
         <AttachmentList attachments={assignment.attachments} />
-        <TouchableOpacity
-          style={styles.urlContainer}
+        <Pressable
           onPress={handleUrlPress}
           onPressIn={() =>
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
           }
+          style={({ pressed }) => [
+            styles.urlContainer,
+            pressed && styles.pressablePressed,
+          ]}
         >
           <Ionicons name="link-outline" size={24} color="#007AFF" />
           <Text style={styles.url} numberOfLines={1} ellipsizeMode="tail">
             {`https://panda.ecs.kyoto-u.ac.jp/portal/site/${assignment.context}`}
           </Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
     </ScrollView>
   );
@@ -203,6 +209,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#F7F7F7",
     padding: 16,
     borderRadius: 12,
+  },
+  pressablePressed: {
+    opacity: 0.85,
   },
   url: {
     fontSize: 16,

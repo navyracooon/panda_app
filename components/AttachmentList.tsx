@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
+import { View, Text, StyleSheet, Alert, Pressable } from "react-native";
 import Attachment from "../models/Attachment";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalization } from "../contexts/LocalizationContext";
@@ -96,13 +96,14 @@ export default function AttachmentList({
     <View style={[styles.container, isLastItem && styles.lastItemContainer]}>
       <Text style={styles.sectionTitle}>{t("assignment.attachments")}</Text>
       {attachments.map((attachment, index) => (
-        <TouchableOpacity
+        <Pressable
           key={index}
-          style={[
+          onPress={() => handleDownload(attachment)}
+          style={({ pressed }) => [
             styles.attachmentItem,
             index === 0 ? styles.firstAttachmentItem : null,
+            pressed && styles.attachmentItemPressed,
           ]}
-          onPress={() => handleDownload(attachment)}
         >
           <Ionicons
             name={getFileIcon(attachment.type)}
@@ -124,7 +125,7 @@ export default function AttachmentList({
           ) : (
             <Ionicons name="download-outline" size={24} color="#007AFF" />
           )}
-        </TouchableOpacity>
+        </Pressable>
       ))}
     </View>
   );
@@ -154,6 +155,9 @@ const styles = StyleSheet.create({
   },
   firstAttachmentItem: {
     borderTopWidth: 0,
+  },
+  attachmentItemPressed: {
+    opacity: 0.85,
   },
   icon: {
     marginRight: 12,
