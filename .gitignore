@@ -24,6 +24,3 @@ expo-env.d.ts
 # dotfile
 .env
 .envrc
-
-# codex
-AGENTS.md
