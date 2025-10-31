@@ -99,6 +99,9 @@ export default function LoginScreen() {
                 autoCapitalize="none"
                 autoCorrect={false}
                 editable={!isLoading}
+                autoComplete="username"
+                textContentType="username"
+                importantForAutofill="yes"
               />
             </View>
             <View style={styles.inputWrapper}>
@@ -116,6 +119,9 @@ export default function LoginScreen() {
                 placeholderTextColor="#999"
                 secureTextEntry
                 editable={!isLoading}
+                autoComplete="password"
+                textContentType="password"
+                importantForAutofill="yes"
               />
             </View>
           </View>
