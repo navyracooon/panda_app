@@ -8,6 +8,7 @@ import {
   Alert,
   Pressable,
   Linking,
+  Platform,
 } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import RenderHtml from "react-native-render-html";
@@ -55,8 +56,24 @@ export default function AssignmentDetailScreen() {
         const calendars = await Calendar.getCalendarsAsync(
           Calendar.EntityTypes.EVENT,
         );
-        const defaultCalendar =
-          calendars.find((cal) => cal.isPrimary) || calendars[0];
+        const writableCalendars = calendars.filter(
+          (cal) => cal.allowsModifications,
+        );
+
+        let defaultCalendar =
+          writableCalendars.find((cal) => cal.isPrimary) ||
+          writableCalendars[0];
+
+        if (!defaultCalendar && Platform.OS === "ios") {
+          try {
+            const iosDefaultCalendar = await Calendar.getDefaultCalendarAsync();
+            if (iosDefaultCalendar?.allowsModifications) {
+              defaultCalendar = iosDefaultCalendar;
+            }
+          } catch (calendarError) {
+            console.warn("Failed to get default iOS calendar", calendarError);
+          }
+        }
 
         if (defaultCalendar) {
           const eventDetails = {
