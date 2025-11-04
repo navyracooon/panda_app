@@ -24,6 +24,7 @@ const { width } = Dimensions.get("window");
 export default function LoginScreen() {
   const [ecsId, setEcsId] = useState("");
   const [password, setPassword] = useState("");
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useUser();
   const router = useRouter();
@@ -117,12 +118,26 @@ export default function LoginScreen() {
                 onChangeText={setPassword}
                 placeholder="Password"
                 placeholderTextColor="#999"
-                secureTextEntry
+                secureTextEntry={!isPasswordVisible}
                 editable={!isLoading}
                 autoComplete="password"
                 textContentType="password"
                 importantForAutofill="yes"
               />
+              <Pressable
+                accessibilityLabel={
+                  isPasswordVisible ? "Hide password" : "Show password"
+                }
+                onPress={() => setIsPasswordVisible((prev) => !prev)}
+                hitSlop={8}
+                disabled={isLoading}
+              >
+                <Ionicons
+                  name={isPasswordVisible ? "eye-off-outline" : "eye-outline"}
+                  size={22}
+                  color="#000"
+                />
+              </Pressable>
             </View>
           </View>
           <Animated.View
