@@ -35,27 +35,58 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const loadUser = async () => {
+    let userCredentialsString: string | null = null;
     try {
-      const userCredentialsString =
-        await SecureStore.getItemAsync("userCredentials");
-      if (userCredentialsString) {
-        const userCredentials = JSON.parse(userCredentialsString);
-        const storedUser = new User(
-          userCredentials.ecsId,
-          userCredentials.password,
-        );
-        await storedUser.checkLogin();
-        setUser(storedUser);
-        return true;
-      }
+      userCredentialsString = await SecureStore.getItemAsync("userCredentials");
+    } catch (storageError) {
+      console.error("Failed to access SecureStore:", storageError);
       return false;
+    }
+
+    if (!userCredentialsString) {
+      return false;
+    }
+
+    let userCredentials: { ecsId: string; password: string };
+    try {
+      userCredentials = JSON.parse(userCredentialsString);
+    } catch (parseError) {
+      console.error("Corrupted credentials in SecureStore:", parseError);
+      await SecureStore.deleteItemAsync("userCredentials");
+      return false;
+    }
+
+    const storedUser = new User(
+      userCredentials.ecsId,
+      userCredentials.password,
+    );
+
+    const tryAuthenticate = async (forceReauthenticate = false) => {
+      await storedUser.checkLogin(forceReauthenticate);
+      setUser(storedUser);
+      return true;
+    };
+
+    try {
+      try {
+        return await tryAuthenticate(false);
+      } catch (initialError) {
+        if (initialError instanceof PandaAuthError) {
+          throw initialError;
+        }
+        console.warn(
+          "Auto-login failed once; retrying with forced reauthentication.",
+          initialError,
+        );
+        return await tryAuthenticate(true);
+      }
     } catch (error) {
       if (error instanceof PandaAuthError) {
         console.warn("Stored credentials are no longer valid.");
+        await SecureStore.deleteItemAsync("userCredentials");
       } else {
         console.error("Error loading user credentials:", error);
       }
-      await SecureStore.deleteItemAsync("userCredentials");
       setUser(null);
       return false;
     }
