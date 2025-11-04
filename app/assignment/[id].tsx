@@ -19,6 +19,7 @@ import { format, differenceInDays } from "date-fns";
 import AttachmentList from "../../components/AttachmentList";
 import { useAssignments } from "../../contexts/AssignmentContext";
 import { useLocalization } from "../../contexts/LocalizationContext";
+import { triggerImpact } from "../../utils/haptics";
 
 export default function AssignmentDetailScreen() {
   const { id } = useLocalSearchParams();
@@ -111,9 +112,7 @@ export default function AssignmentDetailScreen() {
         <Text style={styles.title}>{assignment.title}</Text>
         <Pressable
           onPress={handleDatePress}
-          onPressIn={() =>
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
-          }
+          onPressIn={() => triggerImpact(Haptics.ImpactFeedbackStyle.Medium)}
           style={({ pressed }) => [
             styles.dueDateContainer,
             pressed && styles.pressablePressed,
@@ -148,9 +147,7 @@ export default function AssignmentDetailScreen() {
         <AttachmentList attachments={assignment.attachments} />
         <Pressable
           onPress={handleUrlPress}
-          onPressIn={() =>
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
-          }
+          onPressIn={() => triggerImpact(Haptics.ImpactFeedbackStyle.Medium)}
           style={({ pressed }) => [
             styles.urlContainer,
             pressed && styles.pressablePressed,

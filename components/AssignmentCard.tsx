@@ -13,6 +13,7 @@ import * as Haptics from "expo-haptics";
 import Assignment from "../models/Assignment";
 import RenderHtml from "react-native-render-html";
 import { useLocalization } from "../contexts/LocalizationContext";
+import { triggerImpact } from "../utils/haptics";
 
 type Props = {
   assignment: Assignment;
@@ -41,7 +42,7 @@ export default function AssignmentCard(props: Props) {
   return (
     <Pressable
       onPress={() => router.push(`/assignment/${assignment.id}`)}
-      onPressIn={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)}
+      onPressIn={() => triggerImpact(Haptics.ImpactFeedbackStyle.Medium)}
       style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
     >
       <Text style={styles.siteTitle} numberOfLines={1}>

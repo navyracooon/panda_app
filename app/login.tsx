@@ -18,6 +18,7 @@ import * as Haptics from "expo-haptics";
 import { grantNotificationPermission } from "../utils/notificationUtils";
 import { useUser } from "../contexts/UserContext";
 import { PandaAuthError } from "../utils/PandaUtils";
+import { triggerImpact } from "../utils/haptics";
 
 const { width } = Dimensions.get("window");
 
@@ -61,7 +62,7 @@ export default function LoginScreen() {
   };
 
   const handlePressIn = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+    triggerImpact(Haptics.ImpactFeedbackStyle.Heavy);
     Animated.spring(scaleAnim, {
       toValue: 1.05,
       useNativeDriver: true,

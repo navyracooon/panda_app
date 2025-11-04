@@ -22,6 +22,7 @@ import {
 import { useAssignments } from "../contexts/AssignmentContext";
 import { useLocalization } from "../contexts/LocalizationContext";
 import { useUser } from "../contexts/UserContext";
+import { triggerImpact } from "../utils/haptics";
 
 type LanguageOption = {
   code: string;
@@ -217,9 +218,7 @@ export default function SettingsScreen() {
           <Text style={styles.sectionTitle}>{t("settings.support")}</Text>
           <Pressable
             onPress={handleGitHubContribute}
-            onPressIn={() =>
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
-            }
+            onPressIn={() => triggerImpact(Haptics.ImpactFeedbackStyle.Medium)}
             style={({ pressed }) => [
               styles.supportButton,
               styles.githubButton,
@@ -245,9 +244,7 @@ export default function SettingsScreen() {
           <Text style={styles.sectionTitle}>{t("settings.account")}</Text>
           <Pressable
             onPress={handleLogout}
-            onPressIn={() =>
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy)
-            }
+            onPressIn={() => triggerImpact(Haptics.ImpactFeedbackStyle.Heavy)}
             style={({ pressed }) => [
               styles.button,
               pressed && styles.buttonPressed,
